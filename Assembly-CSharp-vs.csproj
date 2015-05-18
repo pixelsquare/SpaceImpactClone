@@ -46,7 +46,23 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Elements\Base\SICGameElement.cs" />
+     <Compile Include="Assets\Scripts\Elements\Particles\SICExplode.cs" />
+     <Compile Include="Assets\Scripts\Elements\SICBeam.cs" />
+     <Compile Include="Assets\Scripts\Elements\SICEnemy.cs" />
+     <Compile Include="Assets\Scripts\Elements\SICLaser.cs" />
+     <Compile Include="Assets\Scripts\Elements\SICMissile.cs" />
+     <Compile Include="Assets\Scripts\Elements\SICRocket.cs" />
+     <Compile Include="Assets\Scripts\Elements\SICSpaceShip.cs" />
+     <Compile Include="Assets\Scripts\EnemySpawner.cs" />
+     <Compile Include="Assets\Scripts\Managers\SICGameManager.cs" />
+     <Compile Include="Assets\Scripts\Managers\SICLayerManager.cs" />
+     <Compile Include="Assets\Scripts\Object Pool\SICObjectPoolManager.cs" />
+     <Compile Include="Assets\Scripts\Object Pool\SICObjectPoolName.cs" />
+     <Compile Include="Assets\Scripts\SICGameUtility.cs" />
+     <Compile Include="Assets\Scripts\Utility\SICAreaBounds.cs" />
      <Compile Include="Assets\Scripts\Utility\SICCamera.cs" />
+     <Compile Include="Assets\Scripts\Utility\SICGameSettings.cs" />
      <None Include="Assets\Version Number.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity 5/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
