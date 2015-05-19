@@ -36,8 +36,8 @@ public class EnemySpawner : MonoBehaviour {
 			enemy.EnableElement();
 
 			enemyObj.transform.position = new Vector3(
-				UnityEngine.Random.Range(SICAreaBounds.MinPosition.x + (enemy.SpRenderer.bounds.size.x / 2) + 5f, SICAreaBounds.MaxPosition.x - (enemy.SpRenderer.bounds.size.x / 2)),
-				UnityEngine.Random.Range(SICAreaBounds.MinPosition.y + (enemy.SpRenderer.bounds.size.x / 2), SICAreaBounds.MaxPosition.y - (enemy.SpRenderer.bounds.size.x / 2)),
+				UnityEngine.Random.Range(SICAreaBounds.MinPosition.x + (enemy.MainTexture.bounds.size.x / 2) + 5f, SICAreaBounds.MaxPosition.x - (enemy.MainTexture.bounds.size.x / 2)),
+				UnityEngine.Random.Range(SICAreaBounds.MinPosition.y + (enemy.MainTexture.bounds.size.x / 2), SICAreaBounds.MaxPosition.y - (enemy.MainTexture.bounds.size.x / 2)),
 				0f
 			);
 			enemies.Add(enemyObj);

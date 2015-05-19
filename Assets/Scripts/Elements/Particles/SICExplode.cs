@@ -16,7 +16,8 @@ namespace SpaceImpact {
 
 		public void Update() {
 			if (!particle.IsAlive()) {
-				gameObject.SetActive(false);
+				//gameObject.SetActive(false);
+				DisableElement();
 			}
 		}
 	}

@@ -14,7 +14,7 @@ namespace SpaceImpact {
 
 		// Static Variables
 		public const string PARENT_NAME_FORMAT = "{0} Parent";
-		public const string OBJECT_NAME_FORMAT = "{0} {1}";
+		public const string OBJECT_NAME_FORMAT = "{0}_{1}";
 
 		public static SICObjectPoolManager SharedInstance { get { return instance; } }
 

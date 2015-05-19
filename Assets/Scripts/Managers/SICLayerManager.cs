@@ -19,9 +19,9 @@ namespace SpaceImpact {
 			get { return LayerMask.NameToLayer(ENEMY_LAYER); }
 		}
 
-		private const string MISSILE_LAYER = "Missile";
-		public static int MissileLayer {
-			get { return LayerMask.NameToLayer(MISSILE_LAYER); }
+		private const string PROJECTILE_LAYER = "Projectile";
+		public static int ProjectileLayer {
+			get { return LayerMask.NameToLayer(PROJECTILE_LAYER); }
 		}
 	}
 }

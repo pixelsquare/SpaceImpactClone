@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace SpaceImpact {
 
-	public class SICEnemy : SICGameElement {
+	public class SICEnemy : SICGameUnit {
 		// Public Variables	
 
 		// Private Variables
@@ -17,13 +17,9 @@ namespace SpaceImpact {
 			get { return SICObjectPoolName.OBJECT_ENEMY; }
 		}
 
-		public void OnEnable() {
+		public override void OnEnable() {
+			base.OnEnable();
 			targetted = false;
-		}
-
-		public override void DisableElement() {
-			SpawnExplotion();
-			base.DisableElement();
 		}
 
 		public void SetTargetted(bool tgt) {
