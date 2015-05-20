@@ -64,7 +64,11 @@ namespace SpaceImpact {
 			}
 		}
 
-		public void Start() {
+		//public void Start() {
+
+		//}
+
+		public void AddAllElementsToPool() {
 			SICGameElement[] allElements = GameObject.FindObjectsOfType<SICGameElement>();
 
 			for (int i = 0; i < allElements.Length; i++) {

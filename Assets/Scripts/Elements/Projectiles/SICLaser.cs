@@ -39,9 +39,11 @@ namespace SpaceImpact {
 		}
 
 		public override void ProjectileMovement() {
-			float laserLength = (origin.position.x < 0) ?
-				(SICAreaBounds.MaxPosition.x + Mathf.Abs(origin.position.x)) * 10f :
-				(SICAreaBounds.MaxPosition.x - Mathf.Abs(origin.position.x)) * 10f;
+			float rayLength = (origin.position.x < 0) ?
+				(SICAreaBounds.MaxPosition.x + Mathf.Abs(origin.position.x)) :
+				(SICAreaBounds.MaxPosition.x - Mathf.Abs(origin.position.x));
+
+			float laserLength = rayLength * 10f;
 
 			Vector3 scale = transform.localScale;
 			//scale.x = laserLength;
@@ -52,7 +54,7 @@ namespace SpaceImpact {
 
 # if UNITY_EDITOR
 			Debug.DrawLine(origin.position, new Vector3(SICAreaBounds.MaxPosition.x, origin.position.y));
-			//Debug.DrawLine(origin.position, new Vector3((transform.localScale.x / 10f), origin.position.y), Color.red);
+			Debug.DrawLine(origin.position, origin.position + Vector3.right * rayLength, Color.red);
 # endif
 		}
 
@@ -77,11 +79,11 @@ namespace SpaceImpact {
 			// Moving Laser
 			//RaycastHit2D[] objHit = Physics2D.RaycastAll(origin.position, Vector3.right, (transform.localScale.x / 10f), 1 << SICLayerManager.EnemyLayer);
 
-			float laserLength = (origin.position.x < 0) ?
-				(SICAreaBounds.MaxPosition.x + Mathf.Abs(origin.position.x)) * 10f :
-				(SICAreaBounds.MaxPosition.x - Mathf.Abs(origin.position.x)) * 10f;
+			float rayLength = (origin.position.x < 0) ?
+				(SICAreaBounds.MaxPosition.x + Mathf.Abs(origin.position.x)) :
+				(SICAreaBounds.MaxPosition.x - Mathf.Abs(origin.position.x));
 
-			RaycastHit2D[] objHit = Physics2D.RaycastAll(origin.position, Vector3.right, laserLength, 1 << SICLayerManager.EnemyLayer);
+			RaycastHit2D[] objHit = Physics2D.RaycastAll(origin.position, Vector3.right, rayLength, 1 << SICLayerManager.EnemyLayer);
 
 			if (objHit == null || objHit.Length <= 0)
 				return;

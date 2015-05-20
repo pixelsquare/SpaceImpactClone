@@ -17,26 +17,39 @@ namespace SpaceImpact {
 		// Public Variables	
 		[SerializeField] private SICWaypoint waypoints;
 		[SerializeField] private Transform pStartPosition;
+		[SerializeField] private Transform[] elements;
 
-		// Private Variables	
+		// Private Variables
 
 		// Static Variables
 
 		private const string POINT_A_NAME = "Point A";
 		private const string POINT_B_NAME = "Point B";
 
+		public SICWaypoint Waypoints { get { return waypoints; } }
+
+		public Transform PStartPosition { get { return pStartPosition; } }
+
+		public Transform[] Elements { get { return elements; } }
+
 		public Transform PointA { get { return waypoints.PointA; } }
+
 		public Transform PointB { get { return waypoints.PointB; } } 
 
 		# region Game Element
 		public override void OnEnable() {
 			base.OnEnable();
+			ResetStage();
 		}
 
 		public override string OBJECT_ID {
 			get { return SICObjectPoolName.OBJECT_STAGE;  }
 		}
 		# endregion
+
+		public void ResetStage() {
+			SICGameUtility.SetAllElementsRecursively(transform, true);
+		}
 
 		public virtual STAGETYPE GetStageType() {
 			return STAGETYPE.NONE;

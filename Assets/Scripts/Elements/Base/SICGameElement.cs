@@ -52,10 +52,16 @@ namespace SpaceImpact {
 		}
 
 		public void EnableElement() {
+			if (gameObject.activeInHierarchy)
+				return;
+
 			gameObject.SetActive(true);
 		}
 
 		public virtual void DisableElement() {
+			if (!gameObject.activeInHierarchy)
+				return;
+
 			gameObject.SetActive(false);
 		}
 

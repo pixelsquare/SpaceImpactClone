@@ -46,6 +46,8 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Debugging\EnemySpawner.cs" />
+     <Compile Include="Assets\Scripts\Debugging\StageSpawner.cs" />
      <Compile Include="Assets\Scripts\Elements\Base\SICGameElement.cs" />
      <Compile Include="Assets\Scripts\Elements\Particles\SICExplode.cs" />
      <Compile Include="Assets\Scripts\Elements\Projectiles\Base\SICProjectiles.cs" />
@@ -56,7 +58,6 @@
      <Compile Include="Assets\Scripts\Elements\Units\Base\SICGameUnit.cs" />
      <Compile Include="Assets\Scripts\Elements\Units\SICEnemy.cs" />
      <Compile Include="Assets\Scripts\Elements\Units\SICSpaceShip.cs" />
-     <Compile Include="Assets\Scripts\EnemySpawner.cs" />
      <Compile Include="Assets\Scripts\Managers\SICGameManager.cs" />
      <Compile Include="Assets\Scripts\Managers\SICLayerManager.cs" />
      <Compile Include="Assets\Scripts\Metrics\SICGameMetrics.cs" />

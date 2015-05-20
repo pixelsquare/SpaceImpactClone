@@ -33,9 +33,6 @@ namespace SpaceImpact {
 		public override void OnEnable() {
 			base.OnEnable();
 			defaultProjectile = ProjectileType.MISSILE;
-
-			horiz = transform.position.x;
-			vert = transform.position.y;
 		}
 
 		public override void SetHP(int hp) {
@@ -145,6 +142,13 @@ namespace SpaceImpact {
 		public void SetSpecialCount(int count) {
 			this.specialCount = count;
 			SICGameManager.SharedInstance.GameMetrics.SetSpecialCount(this.specialCount);
+		}
+
+		public void SetPosition(Vector3 pos) {
+			horiz = pos.x;
+			vert = pos.y;
+
+			transform.position = pos;
 		}
 
 		private void ProjectileTest() {

@@ -7,6 +7,7 @@ using SpaceImpact.Utility;
 public class EnemySpawner : MonoBehaviour {	
 	// Public Variables	
 	[SerializeField] private int enemyCount = 5;
+	[SerializeField] private float interval = 0.5f;
 
 	// Private Variables	
 	private List<GameObject> enemies;
@@ -15,10 +16,13 @@ public class EnemySpawner : MonoBehaviour {
 
 	private void Start() {
 		enemies = new List<GameObject>();
-		InvokeRepeating("SpawnEnemy", 1, 0.5f);
+		InvokeRepeating("SpawnEnemy", 1, interval);
 	}
 
 	private void Update() {
+		if (enemies == null || enemies.Count <= 0)
+			return;
+
 		for (int i = 0; i < enemies.Count; i++) {
 			if (!enemies[i].activeInHierarchy) {
 				enemies.Remove(enemies[i]);

@@ -10,9 +10,11 @@ namespace SpaceImpact {
 		[SerializeField] private Transform to;
 
 		// Private Variables	
-		private float moveTime;
 		private Vector3 fromLocation;
 		private Vector3 toLocation;
+
+		private float startTime;
+		private float totalDistance;
 
 		// Static Variables
 
@@ -26,15 +28,24 @@ namespace SpaceImpact {
 			this.fromLocation = new Vector3(this.from.position.x, this.from.position.y, transform.position.z);
 			this.toLocation = new Vector3(this.to.position.x, this.to.position.y, transform.position.z);
 
-			moveTime = 0f;
+			startTime = Time.time;
+			totalDistance = Vector3.Distance(fromLocation, toLocation);
 		}
 
 		public void Update() {
 			if (from == null || to == null)
 				return;
 
-			moveTime += Time.deltaTime;
-			transform.position = Vector3.Lerp(fromLocation, toLocation, moveTime * cameraSpeed);
+			float moveSpeed = (Time.time - startTime) * cameraSpeed;
+			float moveTime = moveSpeed / totalDistance;
+			transform.position = Vector3.Lerp(fromLocation, toLocation, moveTime);
+		}
+
+		public void ResetCameraMover() {
+			transform.position = fromLocation;
+
+			startTime = Time.time;
+			totalDistance = Vector3.Distance(fromLocation, toLocation);
 		}
 
 		public void SetCameraSpeed(float spd) {

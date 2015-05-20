@@ -7,7 +7,7 @@ namespace SpaceImpact.GameCore {
 
 	public class SICGameManager : MonoBehaviour {
 		// Public Variables	
-		[SerializeField] private Camera gameCamera;
+		[SerializeField] private SICCameraMover gameCamera;
 		[SerializeField] private SICGameMetrics gameMetrics;
 		[SerializeField] private STAGETYPE stage;
 		[SerializeField] private List<SICGameStage> refStages;
@@ -28,7 +28,7 @@ namespace SpaceImpact.GameCore {
 
 		public SICSpaceShip SpaceShip { get { return spaceShip; } }
 
-		public Camera GameCamera { get { return gameCamera; } } 
+		public SICCameraMover GameCamera { get { return gameCamera; } } 
 
 		public SICGameMetrics GameMetrics { get { return gameMetrics; } }
 
@@ -46,16 +46,20 @@ namespace SpaceImpact.GameCore {
 			gameMetrics.SetScore(SICGameSettings.DEFAULT_SCORE);
 			gameMetrics.SetSpecial(SICGameSettings.DEFAULT_SPECIAL);
 
-			SetStage(stage);
+			SetStage(STAGETYPE.STAGE_1);
 		}
 
-# if UNITY_EDITOR
+//# if UNITY_EDITOR
 		public void Update() {
-			if (Input.GetKeyDown(KeyCode.L)) {
-				SetStage(STAGETYPE.STAGE_1);
+			//if (Input.GetKeyDown(KeyCode.L)) {
+			//    SetStage(STAGETYPE.STAGE_1);
+			//}
+
+			if (Input.GetKeyDown(KeyCode.N)) {
+				ResetStage();
 			}
 		}
-# endif
+//# endif
 
 		public void LoadStage(STAGETYPE stageType) {
 			stageObj = SICObjectPoolManager.SharedInstance.GetObject(GetStage(stageType).OBJECT_ID);
@@ -66,13 +70,33 @@ namespace SpaceImpact.GameCore {
 				cameraMover.Initialize(curStage.PointA, curStage.PointB);
 			}
 
+			InitializeSpaceShip();
+		}
+
+		public void ResetStage() {
+			curStage.ResetStage();
+
+			ResetSpaceShip();
+			gameCamera.ResetCameraMover();
+		}
+
+		public void InitializeSpaceShip() {
+			if (spaceShipObj != null && spaceShipObj.activeInHierarchy)
+				return;
+
 			spaceShipObj = SICObjectPoolManager.SharedInstance.GetObject(SICObjectPoolName.OBJECT_SPACE_SHIP);
-			if (spaceShipObj != null) {
+			ResetSpaceShip();
+		}
+
+		public void ResetSpaceShip() {
+			if (spaceShipObj != null && spaceShip == null) {
 				spaceShip = spaceShipObj.GetComponent<SICSpaceShip>();
-				spaceShip.SetHP(gameMetrics.GetLives());
-				spaceShip.SetSpecial(gameMetrics.GetSpecial());
-				spaceShip.EnableElement();
 			}
+
+			spaceShip.SetHP(gameMetrics.GetLives());
+			spaceShip.SetSpecial(gameMetrics.GetSpecial());
+			spaceShip.SetPosition(curStage.PStartPosition.position);
+			spaceShip.EnableElement();
 		}
 
 		public SICGameStage GetStage(STAGETYPE stageType) {
@@ -80,11 +104,10 @@ namespace SpaceImpact.GameCore {
 		}
 
 		public void SetStage(STAGETYPE stageType) {
-			stage = stageType;
-
-			if (stageType == STAGETYPE.NONE)
+			if (stageType == STAGETYPE.NONE || stage == stageType)
 				return;
 
+			stage = stageType;
 			LoadStage(stage);
 		}
 	}

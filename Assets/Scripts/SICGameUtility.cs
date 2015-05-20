@@ -114,14 +114,18 @@ namespace SpaceImpact {
 			return result;
 		}
 
-		public static Vector3 GetRelativePosition(Transform origin, Vector3 position) {
-			Vector3 distance = position - origin.position;
-			Vector3 relativePosition = Vector3.zero;
-			relativePosition.x = Vector3.Dot(distance, origin.right.normalized);
-			relativePosition.y = Vector3.Dot(distance, origin.up.normalized);
-			relativePosition.z = Vector3.Dot(distance, origin.forward.normalized);
+		public static void SetAllElementsRecursively(Transform root, bool enable) {
+			foreach (Transform obj in root) {
+				SICGameElement element = obj.GetComponent<SICGameElement>();
+				if (element != null) {
+					if (enable)
+						element.EnableElement();
+					else
+						element.DisableElement();
+				}
 
-			return relativePosition;
+				SetAllElementsRecursively(obj, enable);
+			}
 		}
 	}
 }
