@@ -17,16 +17,10 @@ namespace SpaceImpact {
 
 		// Static Variables
 
-		# region Game Element
-		public override string OBJECT_ID {
-			get { return SICObjectPoolName.OBJECT_LASER; }
-		}
-		# endregion
-
 		# region Projectiles
 
-		public override void Initialize(Transform sender) {
-			base.Initialize(sender);
+		public override void Initialize(Transform owner, Transform sender) {
+			base.Initialize(owner, sender);
 			time = 0f;
 			origin = sender;
 
@@ -34,14 +28,18 @@ namespace SpaceImpact {
 			scale.x = 0f;
 			transform.localScale = scale;
 
+			transform.position = origin.position;
+
 			instanceCount = 0;
 			InvokeRepeating("DestroyElementsOnHit", 0.1f, (rayDuration / instances));
 		}
 
-		public override void ProjectileMovement() {
+		public override void OnElementUpdate() {
+			Vector3 endPoint = (Direction.x > 0) ? SICAreaBounds.MaxPosition : SICAreaBounds.MinPosition;
+
 			float rayLength = (origin.position.x < 0) ?
-				(SICAreaBounds.MaxPosition.x + Mathf.Abs(origin.position.x)) :
-				(SICAreaBounds.MaxPosition.x - Mathf.Abs(origin.position.x));
+				(endPoint.x + Mathf.Abs(origin.position.x)) :
+				(endPoint.x - Mathf.Abs(origin.position.x));
 
 			float laserLength = rayLength * 10f;
 
@@ -53,12 +51,12 @@ namespace SpaceImpact {
 			transform.position = origin.position;
 
 # if UNITY_EDITOR
-			Debug.DrawLine(origin.position, new Vector3(SICAreaBounds.MaxPosition.x, origin.position.y));
-			Debug.DrawLine(origin.position, origin.position + Vector3.right * rayLength, Color.red);
+			Debug.DrawLine(origin.position, new Vector3(endPoint.x, origin.position.y));
+			Debug.DrawLine(origin.position, origin.position + (Vector3.right * rayLength), Color.red);
 # endif
 		}
 
-		public override bool ProjectileConstraint() {
+		public override bool OnElementConstraint() {
 			time += Time.deltaTime;
 			return time > rayDuration;
 		}
@@ -79,23 +77,38 @@ namespace SpaceImpact {
 			// Moving Laser
 			//RaycastHit2D[] objHit = Physics2D.RaycastAll(origin.position, Vector3.right, (transform.localScale.x / 10f), 1 << SICLayerManager.EnemyLayer);
 
-			float rayLength = (origin.position.x < 0) ?
-				(SICAreaBounds.MaxPosition.x + Mathf.Abs(origin.position.x)) :
-				(SICAreaBounds.MaxPosition.x - Mathf.Abs(origin.position.x));
+			Vector3 endPoint = (Direction.x > 0) ? SICAreaBounds.MaxPosition : SICAreaBounds.MinPosition;
 
-			RaycastHit2D[] objHit = Physics2D.RaycastAll(origin.position, Vector3.right, rayLength, 1 << SICLayerManager.EnemyLayer);
+			float rayLength = (origin.position.x < 0) ?
+				(endPoint.x + Mathf.Abs(origin.position.x)) :
+				(endPoint.x - Mathf.Abs(origin.position.x));
+
+			//Debug.Log(Vector3.right * rayLength);
+			RaycastHit2D[] objHit = Physics2D.RaycastAll(origin.position, Vector3.right, rayLength, 
+				1 << SICLayerManager.EnemyLayer | 1 << SICLayerManager.BossLayer | 1 << SICLayerManager.ShipLayer);
 
 			if (objHit == null || objHit.Length <= 0)
 				return;
 
 			for (int i = 0; i < objHit.Length; i++) {
-				SICEnemy enemyElement = objHit[i].transform.GetComponent<SICEnemy>();
+				SICGameUnit unit = objHit[i].transform.GetComponent<SICGameUnit>();
+				if (unit != null) {
+					Debug.Log(unit.GetUnitType());
+					if (unit.GetUnitType() == TargetType) {
+						if (TargetType == UnitType.ENEMY) {
+							SICGameEnemy enemyElement = objHit[i].transform.GetComponent<SICGameEnemy>();
+							if (enemyElement != null) {
+								enemyElement.SubtractHP(Damage);
+								SICGameManager.SharedInstance.GameMetrics.AddScore(enemyElement.ScorePoint);
+							}
+						}
 
-				if (enemyElement == null)
-					continue;
-
-				enemyElement.SubtractHP(Damage);
-				SICGameManager.SharedInstance.GameMetrics.AddScore(enemyElement.ScorePoint);
+						if (TargetType == UnitType.SPACE_SHIP) {
+							unit.SubtractHP(1);
+							SICGameManager.SharedInstance.ResetSpaceShip();
+						}
+					}
+				}
 			}
 		}
 	}

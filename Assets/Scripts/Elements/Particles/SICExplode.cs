@@ -3,22 +3,22 @@ using System.Collections;
 
 namespace SpaceImpact {
 
-	public class SICExplode : SICGameElement {
+	public class SICExplode : SICGameParticle {
 		// Public Variables	
 		[SerializeField] private ParticleSystem particle;
 
 		// Private Variables	
 
 		// Static Variables
-		public override string OBJECT_ID {
-			get { return SICObjectPoolName.PARTICLE_EXPLODE; }
-		}
 
-		public void Update() {
-			if (!particle.IsAlive()) {
-				//gameObject.SetActive(false);
-				DisableElement();
-			}
+		# region Game Element
+		public override bool OnElementConstraint() {
+			return !particle.IsAlive();
+		}
+		# endregion
+
+		public override ParticleType GetParticleType() {
+			return ParticleType.UNIT_EXPLOSION;
 		}
 	}
 }

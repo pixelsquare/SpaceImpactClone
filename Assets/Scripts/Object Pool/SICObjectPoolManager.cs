@@ -64,10 +64,6 @@ namespace SpaceImpact {
 			}
 		}
 
-		//public void Start() {
-
-		//}
-
 		public void AddAllElementsToPool() {
 			SICGameElement[] allElements = GameObject.FindObjectsOfType<SICGameElement>();
 
@@ -90,8 +86,137 @@ namespace SpaceImpact {
 			return null;
 		}
 
+		public GameObject GetObject(string id, StageType type) {
+			for (int i = 0; i < objParents.Count; i++) {
+				if (objParents[i].refObj.OBJECT_ID == id) {
+					SICGameStage stage = objParents[i].refObj.GetComponent<SICGameStage>();
+					if (stage != null) {
+						if (stage.GetStageType() == type) {
+							return objParents[i].GetObject();
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+
+		public GameObject GetObject(string id, ProjectileType type) {
+			for (int i = 0; i < objParents.Count; i++) {
+				if (objParents[i].refObj.OBJECT_ID == id) {
+					SICProjectiles projectile = objParents[i].refObj.GetComponent<SICProjectiles>();
+					if (projectile != null) {
+						if (projectile.GetProjectileType() == type) {
+							return objParents[i].GetObject();
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+
+		public GameObject GetObject(string id, BossType type) {
+			for (int i = 0; i < objParents.Count; i++) {
+				if (objParents[i].refObj.OBJECT_ID == id) {
+					SICGameBoss boss = objParents[i].refObj.GetComponent<SICGameBoss>();
+					if (boss != null) {
+						if (boss.GetBossType() == type) {
+							return objParents[i].GetObject();
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+
+		public GameObject GetObject(string id, ParticleType type) {
+			for (int i = 0; i < objParents.Count; i++) {
+				if (objParents[i].refObj.OBJECT_ID == id) {
+					SICGameParticle particle = objParents[i].refObj.GetComponent<SICGameParticle>();
+					if (particle != null) {
+						if (particle.GetParticleType() == type) {
+							return objParents[i].GetObject();
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+
+		public GameObject GetObject(string id, EnemyType type) {
+			for (int i = 0; i < objParents.Count; i++) {
+				if (objParents[i].refObj.OBJECT_ID == id) {
+					SICGameEnemy enemy = objParents[i].refObj.GetComponent<SICGameEnemy>();
+					if (enemy != null) {
+						if (enemy.GetEnemyType() == type) {
+							return objParents[i].GetObject();
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+
+		public GameObject GetObject(string id, UnitType type) {
+			for (int i = 0; i < objParents.Count; i++) {
+				if (objParents[i].refObj.OBJECT_ID == id) {
+					SICGameUnit unit = objParents[i].refObj.GetComponent<SICGameUnit>();
+					if (unit != null) {
+						if (unit.GetUnitType() == type) {
+							return objParents[i].GetObject();
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+
 		public ObjectPooled GetParent(string id) {
 			return objParents.Find(parent => parent.refObj.OBJECT_ID == id);
+		}
+
+		public List<ObjectPooled> GetParents(string id) {
+			return objParents.FindAll(parent => parent.refObj.OBJECT_ID == id);
+		}
+
+		public ObjectPooled GetParent(string id, StageType type) {
+			return objParents.Find(parent => parent.refObj.OBJECT_ID == id && (parent.refObj as SICGameStage).GetStageType() == type);
+		}
+
+		public ObjectPooled GetParent(string id, ProjectileType type) {
+			return objParents.Find(parent => parent.refObj.OBJECT_ID == id && (parent.refObj as SICProjectiles).GetProjectileType() == type);
+		}
+
+		public ObjectPooled GetParent(string id, BossType type) {
+			return objParents.Find(parent => parent.refObj.OBJECT_ID == id && (parent.refObj as SICGameBoss).GetBossType() == type);
+		}
+
+		public ObjectPooled GetParent(string id, ParticleType type) {
+			return objParents.Find(parent => parent.refObj.OBJECT_ID == id && (parent.refObj as SICGameParticle).GetParticleType() == type);
+		}
+
+		public ObjectPooled GetParent(string id, EnemyType type) {
+			return objParents.Find(parent => parent.refObj.OBJECT_ID == id && (parent.refObj as SICGameEnemy).GetEnemyType() == type);
+		}
+
+		public ObjectPooled GetParent(string id, UnitType type) {
+			return objParents.Find(parent => parent.refObj.OBJECT_ID == id && (parent.refObj as SICGameUnit).GetUnitType() == type);
+		}
+
+		public void ResetAllParents() {
+			for (int i = 0; i < objParents.Count; i++) {
+				for (int j = 0; j < objParents[i].objectList.Count; j++) {
+					SICGameElement element = objParents[i].objectList[j].GetComponent<SICGameElement>();
+					if (element != null) {
+						element.DisableElement();
+					}
+				}
+			}
 		}
 	}
 }

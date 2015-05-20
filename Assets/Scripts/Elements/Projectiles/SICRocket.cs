@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using SpaceImpact.Utility;
+using SpaceImpact.GameCore;
 
 namespace SpaceImpact {
 
@@ -19,45 +20,42 @@ namespace SpaceImpact {
 
 		// Static Variables
 
-		# region Game Element
-		public override string OBJECT_ID {
-			get { return SICObjectPoolName.OBJECT_ROCKET; }
-		}
-		# endregion
-
 		# region Projectile
 
-		public override void Initialize(Transform sender) {
-			base.Initialize(sender);
+		public override void Initialize(Transform owner, Transform sender) {
+			base.Initialize(owner, sender);
 			transform.position = sender.position;
 			time = startTime;
 			minPosition = -Vector3.up;
 			maxPosition = Vector3.up;
 
-			SetTarget(SICGameUtility.GetNearestUntargettedEnemy(sender.position));
+			if (TargetType == UnitType.ENEMY) {
+				SetTarget(SICGameUtility.GetNearestUntargettedEnemy(sender.position));
+			}
+
+			if (TargetType == UnitType.SPACE_SHIP) {
+				target = SICGameManager.SharedInstance.SpaceShip.transform;
+			}
 
 			if (target != null) {
 				startTime = Vector3.Distance(transform.position, target.position);
 			}
 		}
 
-		public override void ProjectileMovement() {
+		public override void OnElementUpdate() {
 			time += Time.deltaTime;
 			float waveUp = Mathf.Lerp(minPosition.y, maxPosition.y, Mathf.PingPong(time, waveLength) / waveLength) * amplitude;
 
 			if (target == null) {
-				// Get the nearest target
-				Transform nextTarget = SICGameUtility.GetNearestUntargettedEnemy(transform.position);
-				if (nextTarget != null) {
-					// Determine its X direction
-					float dirX = Mathf.Sign(nextTarget.position.x - transform.position.x);
-
-					if (dirX > 0) {
-						SetTarget(nextTarget);
-					}
+				if (TargetType == UnitType.ENEMY) {
+					SetTarget(SICGameUtility.GetNearestUntargettedEnemy(sender.position));
 				}
 
-				transform.Translate(new Vector3(MoveSpeed, waveUp, 0f) * Time.deltaTime);
+				if (TargetType == UnitType.SPACE_SHIP) {
+					target = SICGameManager.SharedInstance.SpaceShip.transform;
+				}
+
+				transform.Translate(new Vector3(Direction.x * MoveSpeed, waveUp, 0f) * Time.deltaTime);
 			}
 			else {
 				transform.position = Vector3.MoveTowards(transform.position, target.position, MoveSpeed * Time.deltaTime);
@@ -68,8 +66,9 @@ namespace SpaceImpact {
 			}
 		}
 
-		public override bool ProjectileConstraint() {
-			return transform.position.x > SICAreaBounds.MaxPosition.x;
+		public override bool OnElementConstraint() {
+			return transform.position.x > SICAreaBounds.MaxPosition.x ||
+				transform.position.x < SICAreaBounds.MinPosition.x;
 		}
 
 		public override ProjectileType GetProjectileType() {
@@ -82,14 +81,23 @@ namespace SpaceImpact {
 			if (col2D == null)
 				return;
 
-			if (col.gameObject.layer == SICLayerManager.EnemyLayer) {
-				SICEnemy enemyElement = col.GetComponent<SICEnemy>();
+			// Both Enemy and Boss
+			SICGameUnit unit = col.GetComponent<SICGameUnit>();
+			if (unit != null) {
+				if (unit.GetUnitType() == TargetType) {
+					if (TargetType == UnitType.ENEMY) {
+						SICGameEnemy enemy = col.GetComponent<SICGameEnemy>();
+						if (enemy != null) {
+							enemy.SubtractHP(Damage);
+							SubtractDurability(1);
+							SICGameManager.SharedInstance.GameMetrics.AddScore(enemy.ScorePoint);
+						}
+					}
 
-				if (enemyElement == null)
-					return;
+					//if (TargetType == UnitType.SPACE_SHIP) {
 
-				enemyElement.SubtractHP(Damage);
-				SubtractDurability(1);
+					//}
+				}
 			}
 		}
 
@@ -98,10 +106,15 @@ namespace SpaceImpact {
 				return;
 
 			Transform tmpTarget = tgt;
-			SICEnemy enemyTarget = tmpTarget.GetComponent<SICEnemy>();
+			SICGameEnemy enemyTarget = tmpTarget.GetComponent<SICGameEnemy>();
 
-			if (enemyTarget == null)
+			float dirToOwnerX = Mathf.Sign(tgt.position.x - owner.transform.position.x);
+			float dirX = Mathf.Sign(tgt.position.x - transform.position.x);
+
+			if (enemyTarget == null || dirX < 0 || dirToOwnerX < 0) {
+				target = null;
 				return;
+			}
 
 			enemyTarget.SetTargetted(true);
 			target = tmpTarget;

@@ -13,16 +13,10 @@ namespace SpaceImpact {
 
 		// Static Variables
 
-		# region Game Element
-		public override string OBJECT_ID {
-			get { return SICObjectPoolName.OBJECT_BEAM; }
-		}
-		# endregion
-
 		# region Projectiles
 
-		public override void Initialize(Transform sender) {
-			base.Initialize(sender);
+		public override void Initialize(Transform owner, Transform sender) {
+			base.Initialize(owner, sender);
 			transform.position = sender.position;
 
 			Vector3 scale = transform.localScale;
@@ -30,12 +24,13 @@ namespace SpaceImpact {
 			transform.localScale = scale;
 		}
 
-		public override void ProjectileMovement() {
-			transform.Translate(Vector3.right * MoveSpeed * Time.deltaTime);
+		public override void OnElementUpdate() {
+			transform.Translate(Direction * MoveSpeed * Time.deltaTime);
 		}
 
-		public override bool ProjectileConstraint() {
-			return transform.position.x > SICAreaBounds.MaxPosition.x;
+		public override bool OnElementConstraint() {
+			return transform.position.x > SICAreaBounds.MaxPosition.x ||
+				transform.position.x < SICAreaBounds.MinPosition.x;
 		}
 
 		public override ProjectileType GetProjectileType() {
@@ -48,15 +43,23 @@ namespace SpaceImpact {
 			if (col2D == null)
 				return;
 
-			if (col.gameObject.layer == SICLayerManager.EnemyLayer) {
-				SICEnemy enemyElement = col.GetComponent<SICEnemy>();
+			// Both Enemy and Boss
+			SICGameUnit unit = col.GetComponent<SICGameUnit>();
+			if (unit != null) {
+				if (unit.GetUnitType() == TargetType) {
+					if (TargetType == UnitType.ENEMY) {
+						SICGameEnemy enemy = col.GetComponent<SICGameEnemy>();
+						if (enemy != null) {
+							enemy.SubtractHP(Damage);
+							SubtractDurability(1);
+							SICGameManager.SharedInstance.GameMetrics.AddScore(enemy.ScorePoint);
+						}
+					}
 
-				if (enemyElement == null)
-					return;
+					//if (TargetType == UnitType.SPACE_SHIP) {
 
-				enemyElement.SubtractHP(Damage);
-				SubtractDurability(1);
-				SICGameManager.SharedInstance.GameMetrics.AddScore(enemyElement.ScorePoint);
+					//}
+				}
 			}
 		}
 	}

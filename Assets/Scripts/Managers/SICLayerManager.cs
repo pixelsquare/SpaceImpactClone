@@ -23,5 +23,10 @@ namespace SpaceImpact {
 		public static int ProjectileLayer {
 			get { return LayerMask.NameToLayer(PROJECTILE_LAYER); }
 		}
+
+		private const string BOSS_LAYER = "Boss";
+		public static int BossLayer {
+			get { return LayerMask.NameToLayer(BOSS_LAYER); }
+		}
 	}
 }

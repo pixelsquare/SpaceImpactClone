@@ -10,16 +10,10 @@ namespace SpaceImpact {
 
 		// Static Variables
 
-		# region Game Element
-		public override string OBJECT_ID {
-			get { return SICObjectPoolName.STAGE_1; }
-		}
-		# endregion
-
 		# region Stage
 
-		public override STAGETYPE GetStageType() {
-			return STAGETYPE.STAGE_1;
+		public override StageType GetStageType() {
+			return StageType.STAGE_1;
 		}
 
 		# endregion

@@ -49,6 +49,12 @@
      <Compile Include="Assets\Scripts\Debugging\EnemySpawner.cs" />
      <Compile Include="Assets\Scripts\Debugging\StageSpawner.cs" />
      <Compile Include="Assets\Scripts\Elements\Base\SICGameElement.cs" />
+     <Compile Include="Assets\Scripts\Elements\Enemies\Base\SICGameEnemy.cs" />
+     <Compile Include="Assets\Scripts\Elements\Enemies\Boss\Base\SICGameBoss.cs" />
+     <Compile Include="Assets\Scripts\Elements\Enemies\Boss\SICBoss1.cs" />
+     <Compile Include="Assets\Scripts\Elements\Enemies\Boss\SICBoss2.cs" />
+     <Compile Include="Assets\Scripts\Elements\Enemies\SICEnemy1.cs" />
+     <Compile Include="Assets\Scripts\Elements\Particles\Base\SICGameParticle.cs" />
      <Compile Include="Assets\Scripts\Elements\Particles\SICExplode.cs" />
      <Compile Include="Assets\Scripts\Elements\Projectiles\Base\SICProjectiles.cs" />
      <Compile Include="Assets\Scripts\Elements\Projectiles\SICBeam.cs" />
@@ -56,7 +62,6 @@
      <Compile Include="Assets\Scripts\Elements\Projectiles\SICMissile.cs" />
      <Compile Include="Assets\Scripts\Elements\Projectiles\SICRocket.cs" />
      <Compile Include="Assets\Scripts\Elements\Units\Base\SICGameUnit.cs" />
-     <Compile Include="Assets\Scripts\Elements\Units\SICEnemy.cs" />
      <Compile Include="Assets\Scripts\Elements\Units\SICSpaceShip.cs" />
      <Compile Include="Assets\Scripts\Managers\SICGameManager.cs" />
      <Compile Include="Assets\Scripts\Managers\SICLayerManager.cs" />
@@ -68,11 +73,13 @@
      <Compile Include="Assets\Scripts\SICWaypoint.cs" />
      <Compile Include="Assets\Scripts\Stage\Base\SICGameStage.cs" />
      <Compile Include="Assets\Scripts\Stage\SICStage1.cs" />
+     <Compile Include="Assets\Scripts\Stage\SICStage2.cs" />
      <Compile Include="Assets\Scripts\Utility\SICAreaBounds.cs" />
      <Compile Include="Assets\Scripts\Utility\SICCamera.cs" />
      <Compile Include="Assets\Scripts\Utility\SICCameraMover.cs" />
      <Compile Include="Assets\Scripts\Utility\SICGameSettings.cs" />
      <None Include="Assets\Version Number.txt" />
+     <None Include="Assets\Space Impact Placeholder.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity 5/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

@@ -23,7 +23,11 @@ namespace SpaceImpact {
 		private int originalDurability;
 		private int originalDamage;
 
+		private Vector3 direction;
+		private UnitType targetType;
+
 		protected Transform owner;
+		protected Transform sender;
 
 		// Static Variables
 
@@ -33,7 +37,13 @@ namespace SpaceImpact {
 
 		public int Damage { get { return damage; } }
 
+		public Vector3 Direction { get { return direction; } }
+
+		public UnitType TargetType { get { return targetType; } }
+
 		public Transform Owner { get { return owner; } }
+
+		public Transform Sender { get { return sender; } } 
 
 		# region Game Element
 		public override void Awake() {
@@ -41,10 +51,16 @@ namespace SpaceImpact {
 			originalTexture = mainTexture;
 			originalDurability = durability;
 			originalDamage = damage;
+			direction = Vector3.right;
 		}
 
 		public override void OnEnable() {
 			base.OnEnable();
+			ResetElement();
+		}
+
+		public override void ResetElement() {
+			base.ResetElement();
 			mainTexture = originalTexture;
 			durability = originalDurability;
 			damage = originalDamage;
@@ -55,58 +71,37 @@ namespace SpaceImpact {
 		}
 		# endregion
 
-		public void Update() {
-			ProjectileMovement();
-
-			if (ProjectileConstraint()) {
-				DisableElement();
-			}
-		}
-
-		public virtual void Initialize(Transform sender) {
-			this.owner = sender;
-		}
-
-		public virtual void ProjectileMovement() { }
-
-		public virtual bool ProjectileConstraint() {
-			return false;
+		public virtual void Initialize(Transform owner, Transform sender) {
+			this.owner = owner;
+			this.sender = sender;
 		}
 
 		public virtual ProjectileType GetProjectileType() {
 			return ProjectileType.MISSILE;
 		}
 
-		public void OnTriggerEnter2D(Collider2D col) {
+		public virtual void OnTriggerEnter2D(Collider2D col) {
 			if (col2D == null)
 				return;
 
-			if (col.gameObject.layer == SICLayerManager.EnemyLayer) {
-				SICEnemy enemyElement = col.GetComponent<SICEnemy>();
+			// Both Enemy and Boss
+			SICGameUnit unit = col.GetComponent<SICGameUnit>();
+			if (unit != null) {
+				if (unit.GetUnitType() == targetType) {
+					if (targetType == UnitType.ENEMY) {
+						SICGameEnemy enemy = col.GetComponent<SICGameEnemy>();
+						if (enemy != null) {
+							SubtractDurability(1);
+							SICGameManager.SharedInstance.GameMetrics.AddScore(enemy.ScorePoint);
+							enemy.SubtractHP(damage);
+						}
+					}
 
-				if (enemyElement == null)
-					return;
-
-				enemyElement.SubtractHP(damage);
-				SubtractDurability(1);
-				SICGameManager.SharedInstance.GameMetrics.AddScore(enemyElement.ScorePoint);
-			}
-
-			if (col.gameObject.layer == SICLayerManager.ProjectileLayer) {
-				SICProjectiles projectileElement = col.GetComponent<SICProjectiles>();
-
-				if (projectileElement == null)
-					return;
-
-				if (projectileElement.Owner == owner)
-					return;
-
-				projectileElement.ShowExplosionFX();
-				//projectileElement.DisableElement();
-				//DisableElement();
-				//durability--;
-				projectileElement.SubtractDurability(1);
-				SubtractDurability(1);
+					if (targetType == UnitType.SPACE_SHIP) {
+						unit.SubtractHP(1);
+						SICGameManager.SharedInstance.ResetSpaceShip();
+					}
+				}
 			}
 		}
 
@@ -135,6 +130,14 @@ namespace SpaceImpact {
 
 		public void SetDurability(int dur) {
 			durability = dur;
+		}
+
+		public void SetDirection(Vector3 dir) {
+			direction = dir;
+		}
+
+		public void SetTargetType(UnitType type) {
+			targetType = type;
 		}
 	}
 }

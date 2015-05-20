@@ -36,7 +36,7 @@ public class EnemySpawner : MonoBehaviour {
 
 		GameObject enemyObj = SICObjectPoolManager.SharedInstance.GetObject(SICObjectPoolName.OBJECT_ENEMY);
 		if (enemyObj != null) {
-			SICEnemy enemy = enemyObj.GetComponent<SICEnemy>();
+			SICGameEnemy enemy = enemyObj.GetComponent<SICGameEnemy>();
 			enemy.EnableElement();
 
 			enemyObj.transform.position = new Vector3(

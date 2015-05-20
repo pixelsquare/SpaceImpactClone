@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using SpaceImpact.Utility;
 
 namespace SpaceImpact {
 
@@ -25,11 +26,34 @@ namespace SpaceImpact {
 		}
 
 		public virtual void OnEnable() {
-			moveSpeed = originalMoveSpeed;
 			InitializeRBody();
 		}
 
 		public virtual void Start() { }
+
+		public virtual void OnElementUpdate() { }
+
+		public virtual bool OnElementConstraint() { return false; }
+
+		public virtual void ResetElement() {
+			moveSpeed = originalMoveSpeed;
+		}
+
+		public void Update() {
+			if (!IsElementVisible())
+				return;
+
+			OnElementUpdate();
+
+			if (OnElementConstraint()) {
+				DisableElement();
+			}
+		}
+
+		public bool IsElementVisible() {
+			return !(transform.position.x < SICAreaBounds.MinExPosition.x || transform.position.x > SICAreaBounds.MaxExPosition.x) &&
+				!(transform.position.y < SICAreaBounds.MinExPosition.y || transform.position.y > SICAreaBounds.MaxExPosition.y);
+		}
 
 		public void InitializeRBody() {
 			if (rBody2D == null)
@@ -66,7 +90,7 @@ namespace SpaceImpact {
 		}
 
 		public virtual void ShowExplosionFX() {
-			GameObject explodeObj = SICObjectPoolManager.SharedInstance.GetObject(SICObjectPoolName.PARTICLE_EXPLODE);
+			GameObject explodeObj = SICObjectPoolManager.SharedInstance.GetObject(SICObjectPoolName.OBJECT_PARTICLE, ParticleType.UNIT_EXPLOSION);
 			if (explodeObj != null) {
 				explodeObj.transform.position = transform.position;
 				SICGameElement explode = explodeObj.GetComponent<SICGameElement>();

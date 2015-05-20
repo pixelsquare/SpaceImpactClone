@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 using SpaceImpact.Utility;
+using System.Collections.Generic;
 
 namespace SpaceImpact {
 
-	public enum STAGETYPE {
+	public enum StageType {
 		NONE = 0,
 		STAGE_1 = 1,
 		STAGE_2 = 2,
 		STAGE_3 = 3,
 		STAGE_4 = 4,
-		STAGE_5 = 5,
+		STAGE_5 = 5
 	}
 
 	public class SICGameStage : SICGameElement {
@@ -20,6 +21,7 @@ namespace SpaceImpact {
 		[SerializeField] private Transform[] elements;
 
 		// Private Variables
+		private List<Vector3> elementPos;
 
 		// Static Variables
 
@@ -37,22 +39,41 @@ namespace SpaceImpact {
 		public Transform PointB { get { return waypoints.PointB; } } 
 
 		# region Game Element
+		public override void Awake() {
+			base.Awake();
+			elementPos = new List<Vector3>();
+
+			if (elements.Length <= 0)
+				return;
+
+			for (int i = 0; i < elements.Length; i++) {
+				elementPos.Add(elements[i].transform.position);
+			}
+		}
+
 		public override void OnEnable() {
 			base.OnEnable();
 			ResetStage();
 		}
 
 		public override string OBJECT_ID {
-			get { return SICObjectPoolName.OBJECT_STAGE;  }
+			get { return SICObjectPoolName.OBJECT_GAME_STAGE;  }
 		}
 		# endregion
 
 		public void ResetStage() {
 			SICGameUtility.SetAllElementsRecursively(transform, true);
+
+			if (elements.Length <= 0)
+				return;
+
+			for (int i = 0; i < elements.Length; i++) {
+				elements[i].transform.position = elementPos[i];
+			}
 		}
 
-		public virtual STAGETYPE GetStageType() {
-			return STAGETYPE.NONE;
+		public virtual StageType GetStageType() {
+			return StageType.NONE;
 		}
 	}
 }

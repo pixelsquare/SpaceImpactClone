@@ -5,21 +5,8 @@ using System.Collections.Generic;
 namespace SpaceImpact {
 
 	public class SICGameUtility {
-		public static List<GameObject> GetAllEnemies() {
-			return SICObjectPoolManager.SharedInstance.GetParent(SICObjectPoolName.OBJECT_ENEMY).objectList;
-		}
-
 		public static List<GameObject> GetAllVisibleEnemies() {
-			List<GameObject> result = new List<GameObject>();
-			for (int i = 0; i < GetAllEnemies().Count; i++) {
-				GameObject obj = GetAllEnemies()[i];
-				if (!obj.activeInHierarchy)
-					continue;
-
-				result.Add(obj);
-			}
-
-			return result;
+			return SICObjectPoolManager.SharedInstance.GetParent(SICObjectPoolName.OBJECT_ENEMY).objectList.FindAll(a => a.activeInHierarchy);
 		}
 
 		public static Transform GetRandomEnemy() {
@@ -73,6 +60,7 @@ namespace SpaceImpact {
 			return result;
 		}
 
+		// TODO: FIX Finding proper target
 		public static Transform GetNearestUntargettedEnemy(Vector3 from) {
 			Transform result = null;
 
@@ -84,7 +72,7 @@ namespace SpaceImpact {
 
 			for (int i = 0; i < GetNearestEnemies(from).Count; i++) {
 				GameObject enemyObj = GetNearestEnemies(from)[i];
-				SICEnemy enemy = enemyObj.GetComponent<SICEnemy>();
+				SICGameEnemy enemy = enemyObj.GetComponent<SICGameEnemy>();
 				if (enemy == null)
 					continue;
 
@@ -112,6 +100,10 @@ namespace SpaceImpact {
 			});
 
 			return result;
+		}
+
+		public static List<GameObject> GetAllProjectilesOfType(ProjectileType type) {
+			return SICObjectPoolManager.SharedInstance.GetParent(SICObjectPoolName.OBJECT_PROJECTILE, type).objectList.FindAll(a => a.activeInHierarchy);
 		}
 
 		public static void SetAllElementsRecursively(Transform root, bool enable) {

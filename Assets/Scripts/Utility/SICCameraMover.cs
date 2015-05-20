@@ -42,10 +42,12 @@ namespace SpaceImpact {
 		}
 
 		public void ResetCameraMover() {
-			transform.position = fromLocation;
+			transform.position = Vector3.zero;
+			from = null;
+			to = null;
 
-			startTime = Time.time;
-			totalDistance = Vector3.Distance(fromLocation, toLocation);
+			startTime = 0f;
+			totalDistance = 0f;
 		}
 
 		public void SetCameraSpeed(float spd) {

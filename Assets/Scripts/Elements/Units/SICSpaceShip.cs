@@ -8,8 +8,7 @@ namespace SpaceImpact {
 
 	public class SICSpaceShip : SICGameUnit {
 		// Public Variables	
-		[SerializeField] private Transform shipNozzle;
-		[SerializeField] private List<SICProjectiles> refProjectiles;
+		[SerializeField] private float invlunerabilityDuration = 3f;
 
 		// Private Variables
 		private ProjectileType defaultProjectile;
@@ -33,6 +32,7 @@ namespace SpaceImpact {
 		public override void OnEnable() {
 			base.OnEnable();
 			defaultProjectile = ProjectileType.MISSILE;
+			//StartCoroutine(Invulnerability());
 		}
 
 		public override void SetHP(int hp) {
@@ -45,55 +45,46 @@ namespace SpaceImpact {
 			SICGameManager.SharedInstance.GameMetrics.SetScore(score);
 		}
 
+		public override UnitType GetUnitType() {
+			return UnitType.SPACE_SHIP;
+		}
+
 		# endregion
 
-		public void Update() {
+		public override void OnElementUpdate() {
 			ShipMovement();
+			ShipFiring();
+			ClampShipToArea();
+			ProjectileTest();
+		}
 
+		private void ShipFiring() {
 			if (Input.GetButtonDown("Fire")) {
-				FireProjectile(defaultProjectile);
+				FireProjectile(defaultProjectile, Vector3.right, UnitType.ENEMY);
 			}
 
 			if (Input.GetButtonDown("Fire1")) {
 				if (specialCount <= 0)
 					return;
 
-				FireProjectile(specialProjectile);
+				FireProjectile(specialProjectile, Vector3.right, UnitType.ENEMY);
 				SubtractSpecialCount(1);
 			}
-
-			ProjectileTest();
 		}
 
 		private void ShipMovement() {
 			Vector3 targetPos = new Vector3(SICAreaBounds.ThisT.position.x, SICAreaBounds.ThisT.position.y, 0f);
-			if (Input.GetButton("Horizontal")) {
-				horiz += Input.GetAxis("Horizontal") * MoveSpeed * Time.deltaTime;
-			}
-
-			if (Input.GetButton("Vertical")) {
-				vert += Input.GetAxis("Vertical") * MoveSpeed * Time.deltaTime;
-			}
+			horiz += Input.GetAxisRaw("Horizontal") * MoveSpeed * Time.deltaTime;
+			vert += Input.GetAxisRaw("Vertical") * MoveSpeed * Time.deltaTime;
 
 			transform.position = targetPos + new Vector3(horiz, vert, 0f);
-
-			ShipConstraint();
 		}
 
-		private void ShipConstraint() {
+		private void ClampShipToArea() {
 			Vector3 pos = transform.position;
 			pos.x = Mathf.Clamp(pos.x, SICAreaBounds.MinPosition.x + (MainTexture.bounds.size.x / 2), SICAreaBounds.MaxPosition.x - (MainTexture.bounds.size.x / 2));
 			pos.y = Mathf.Clamp(pos.y, SICAreaBounds.MinPosition.y + (MainTexture.bounds.size.y / 2), SICAreaBounds.MaxPosition.y - (MainTexture.bounds.size.y / 2));
 			transform.position = pos;
-		}
-
-		private void FireProjectile(ProjectileType type) {
-			GameObject projectileObj = SICObjectPoolManager.SharedInstance.GetObject(GetRefProjectile(type).OBJECT_ID);
-			if (projectileObj != null) {
-				SICProjectiles projectile = projectileObj.GetComponent<SICProjectiles>();
-				projectile.Initialize(shipNozzle);
-				projectile.EnableElement();
-			}
 		}
 
 		public void SetSpecial(ProjectileType special) {
@@ -110,10 +101,6 @@ namespace SpaceImpact {
 		public void UpdateSpecial(ProjectileType type) {
 			specialProjectile = type;
 			SICGameManager.SharedInstance.GameMetrics.SetSpecial(this.specialProjectile);
-		}
-
-		public SICProjectiles GetRefProjectile(ProjectileType type) {
-			return refProjectiles.Find(a => a.GetProjectileType() == type);
 		}
 
 		public int GetSpecialDefaultCount(ProjectileType type) {
@@ -148,7 +135,15 @@ namespace SpaceImpact {
 			horiz = pos.x;
 			vert = pos.y;
 
-			transform.position = pos;
+			Vector3 targetPos = new Vector3(SICAreaBounds.ThisT.position.x, SICAreaBounds.ThisT.position.y, 0f);
+			transform.position = targetPos + new Vector3(horiz, vert, 0f);
+		}
+
+		private IEnumerator Invulnerability() {
+			SetInvulnerability(true);
+			yield return new WaitForSeconds(invlunerabilityDuration);
+			SetInvulnerability(false);
+
 		}
 
 		private void ProjectileTest() {
