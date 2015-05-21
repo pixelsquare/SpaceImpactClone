@@ -58,7 +58,8 @@ namespace SpaceImpact {
 				transform.Translate(new Vector3(Direction.x * MoveSpeed, waveUp, 0f) * Time.deltaTime);
 			}
 			else {
-				transform.position = Vector3.MoveTowards(transform.position, target.position, MoveSpeed * Time.deltaTime);
+				Vector3 dir = (target.position - transform.position).normalized;
+				transform.Translate(new Vector3(dir.x * MoveSpeed, waveUp + dir.y, 0f) * Time.deltaTime);
 
 				if (!target.gameObject.activeInHierarchy) {
 					target = null;
@@ -116,8 +117,12 @@ namespace SpaceImpact {
 				return;
 			}
 
-			enemyTarget.SetTargetted(true);
 			target = tmpTarget;
+
+			if (enemyTarget.GetEnemyType() == EnemyType.BOSS)
+				return;
+
+			enemyTarget.SetTargetted(true);
 		}
 	}
 }

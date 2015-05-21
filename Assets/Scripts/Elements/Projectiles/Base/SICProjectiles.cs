@@ -98,38 +98,50 @@ namespace SpaceImpact {
 					}
 
 					if (targetType == UnitType.SPACE_SHIP) {
-						unit.SubtractHP(1);
-						SICGameManager.SharedInstance.ResetSpaceShip();
+						SICSpaceShip ship = unit.GetComponent<SICSpaceShip>();
+						SubtractDurability(999);
+						ship.SubtractHP(1);
+
+						if (ship.IsInvulnerable)
+							return;
+
+						SICGameManager.SharedInstance.RespawnShip();
 					}
 				}
 			}
 		}
 
 		public void AddDamage(int dmg) {
-			damage += dmg;
+			this.damage += dmg;
+			SetDamage(this.damage);
 		}
 
 		public void SubtractDamage(int dmg) {
-			damage -= dmg;
+			this.damage -= dmg;
+			SetDamage(this.damage);
 		}
 
 		public void SetDamage(int dmg) {
-			damage = dmg;
+			this.damage = dmg;
+			this.damage = Mathf.Clamp(this.damage, 0, int.MaxValue);
 		}
 
 		public void AddDurability(int dur) {
-			durability += dur;
+			this.durability += dur;
+			SetDurability(this.durability);
 		}
 
 		public void SubtractDurability(int dur) {
-			durability -= dur;
+			this.durability -= dur;
+			SetDurability(this.durability);
 
-			if (durability <= 0)
+			if (this.durability <= 0)
 				DisableElement();
 		}
 
 		public void SetDurability(int dur) {
-			durability = dur;
+			this.durability = dur;
+			this.durability = Mathf.Clamp(this.durability, 0, int.MaxValue);
 		}
 
 		public void SetDirection(Vector3 dir) {

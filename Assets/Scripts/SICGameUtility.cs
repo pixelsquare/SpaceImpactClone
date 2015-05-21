@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SpaceImpact {
 
 	public class SICGameUtility {
 		public static List<GameObject> GetAllVisibleEnemies() {
-			return SICObjectPoolManager.SharedInstance.GetParent(SICObjectPoolName.OBJECT_ENEMY).objectList.FindAll(a => a.activeInHierarchy);
+			return SICObjectPoolManager.SharedInstance.GetParent(SICObjectPoolName.OBJECT_ENEMY).objectList.FindAll(a => (a.GetComponent<SICGameElement>()).IsElementVisible());
 		}
 
 		public static Transform GetRandomEnemy() {
@@ -117,6 +118,52 @@ namespace SpaceImpact {
 				}
 
 				SetAllElementsRecursively(obj, enable);
+			}
+		}
+
+		public static string GetSpecialIcon(ProjectileType type) {
+			string result = string.Empty;
+
+			if (type == ProjectileType.ROCKET) {
+				result = "♣";
+			}
+			else if (type == ProjectileType.LASER) {
+				result = "└";
+			}
+			else if (type == ProjectileType.BEAM) {
+				result = "┬";
+			}
+
+			return result;
+		}
+
+		public static string GetLivesIcon(int lives) {
+			StringBuilder result = new StringBuilder();
+			for (int i = 0; i < lives; i++) {
+				result.Append("♥");
+			}
+			return result.ToString();
+		}
+
+		public static void GetElementsRecursively(Transform root, ref List<SICGameElement> elements) {
+			foreach (Transform obj in root) {
+				SICGameElement element = obj.GetComponent<SICGameElement>();
+				if (element != null) {
+					elements.Add(element);
+				}
+
+				GetElementsRecursively(obj, ref elements);
+			}
+		}
+
+		public static void GetEnemyRecursively(Transform root, ref List<SICGameEnemy> elements) {
+			foreach (Transform obj in root) {
+				SICGameEnemy element = obj.GetComponent<SICGameEnemy>();
+				if (element != null) {
+					elements.Add(element);
+				}
+
+				GetEnemyRecursively(obj, ref elements);
 			}
 		}
 	}

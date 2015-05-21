@@ -18,10 +18,12 @@ namespace SpaceImpact {
 		// Public Variables	
 		[SerializeField] private SICWaypoint waypoints;
 		[SerializeField] private Transform pStartPosition;
-		[SerializeField] private Transform[] elements;
 
 		// Private Variables
 		private List<Vector3> elementPos;
+		private List<SICGameElement> stageElements;
+
+		private SICGameBoss stageBoss;
 
 		// Static Variables
 
@@ -32,7 +34,9 @@ namespace SpaceImpact {
 
 		public Transform PStartPosition { get { return pStartPosition; } }
 
-		public Transform[] Elements { get { return elements; } }
+		public List<SICGameElement> StageElements { get { return stageElements; } }
+
+		public SICGameBoss StageBoss { get { return stageBoss; } }
 
 		public Transform PointA { get { return waypoints.PointA; } }
 
@@ -43,17 +47,26 @@ namespace SpaceImpact {
 			base.Awake();
 			elementPos = new List<Vector3>();
 
-			if (elements.Length <= 0)
+			stageElements = new List<SICGameElement>();
+			SICGameUtility.GetElementsRecursively(transform, ref stageElements);
+
+			if (stageElements.Count <= 0)
 				return;
 
-			for (int i = 0; i < elements.Length; i++) {
-				elementPos.Add(elements[i].transform.position);
+			List<SICGameEnemy> enemyList = new List<SICGameEnemy>();
+			SICGameUtility.GetEnemyRecursively(transform, ref enemyList);
+
+			stageBoss = enemyList.Find(a => a.GetEnemyType() == EnemyType.BOSS) as SICGameBoss;
+
+			for (int i = 0; i < stageElements.Count; i++) {
+				elementPos.Add(stageElements[i].transform.position);
 			}
 		}
 
 		public override void OnEnable() {
 			base.OnEnable();
 			ResetStage();
+			AddElementsToPool();
 		}
 
 		public override string OBJECT_ID {
@@ -61,14 +74,30 @@ namespace SpaceImpact {
 		}
 		# endregion
 
+		public void AddElementsToPool() {
+			if (stageElements == null || stageElements.Count <= 0)
+				return;
+
+			for (int i = 0; i < stageElements.Count; i++) {
+				for (int j = 0; j < SICObjectPoolManager.SharedInstance.ObjParents.Count; j++) {
+					if (!stageElements[i].IsElementActive)
+						continue;
+
+					if (stageElements[i].OBJECT_ID == SICObjectPoolManager.SharedInstance.ObjParents[j].refObj.OBJECT_ID) {
+						SICObjectPoolManager.SharedInstance.ObjParents[j].AddObject(stageElements[i].gameObject, false);
+					}
+				}
+			}
+		}
+
 		public void ResetStage() {
 			SICGameUtility.SetAllElementsRecursively(transform, true);
 
-			if (elements.Length <= 0)
+			if (stageElements.Count <= 0)
 				return;
 
-			for (int i = 0; i < elements.Length; i++) {
-				elements[i].transform.position = elementPos[i];
+			for (int i = 0; i < stageElements.Count; i++) {
+				stageElements[i].transform.position = elementPos[i];
 			}
 		}
 

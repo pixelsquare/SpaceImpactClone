@@ -7,7 +7,8 @@ namespace SpaceImpact {
 	public enum UnitType {
 		NONE = 0,
 		SPACE_SHIP = 1,
-		ENEMY = 2
+		ENEMY = 2,
+		POWERUP = 3
 	}
 
 	public class SICGameUnit : SICGameElement {
@@ -16,14 +17,18 @@ namespace SpaceImpact {
 		[SerializeField] private int healthPoints = 1;
 		[SerializeField] private int scorePoint = 0;
 		[SerializeField] private bool invulnerable;
-		[SerializeField] private Transform shipNozzle;
+		[SerializeField] private SICInvulnerable invulnerableVFX;
+		[SerializeField] private Transform projectileNozzle;
 		[SerializeField] private List<SICProjectiles> refProjectiles;
+		[SerializeField] private List<SICElementMover> elementMover;
 
 		// Private Variables	
 		private SpriteRenderer originalTexture;
 		private int originalHealthPoints;
 		private int originalScorePoint;
 		private bool originalInvulnerable;
+
+		private int curMove;
 
 		// Static Variables
 
@@ -38,10 +43,35 @@ namespace SpaceImpact {
 			originalHealthPoints = healthPoints;
 			originalScorePoint = scorePoint;
 			originalInvulnerable = invulnerable;
+
+			if (elementMover.Count > 0) {
+				//transform.position = elementMover[0].Path[0];
+				for (int i = 0; i < elementMover.Count; i++) {
+					elementMover[i].Initialize(transform);
+				}
+			}
 		}
 
 		public override void OnEnable() {
 			base.OnEnable();
+			SetInvulnerability(invulnerable);
+			curMove = 0;
+		}
+
+		public override void OnElementUpdate() {
+			base.OnElementUpdate();
+
+			if (elementMover.Count > 0) {
+				elementMover[curMove].UpdateMove();
+				if (elementMover[curMove].IsFinished) {
+					curMove++;
+					curMove = Mathf.Clamp(curMove, 0, elementMover.Count - 1);
+				}
+			}
+
+			//for (int i = 0; i < elementMover.Count; i++) {
+			//    elementMover[i].UpdateMove();
+			//}
 		}
 
 		public override string OBJECT_ID {
@@ -50,7 +80,7 @@ namespace SpaceImpact {
 		# endregion
 
 		public void FireProjectile(ProjectileType type, Vector3 direction, UnitType targetType) {
-			if (shipNozzle == null || type == ProjectileType.NONE)
+			if (projectileNozzle == null || type == ProjectileType.NONE)
 				return;
 
 			GameObject projectileObj = SICObjectPoolManager.SharedInstance.GetObject(GetRefProjectile(type).OBJECT_ID, type);
@@ -59,7 +89,7 @@ namespace SpaceImpact {
 				projectile.EnableElement();
 				projectile.SetTargetType(targetType);
 				projectile.SetDirection(direction);
-				projectile.Initialize(transform, shipNozzle);
+				projectile.Initialize(transform, projectileNozzle);
 			}
 		}
 
@@ -75,8 +105,12 @@ namespace SpaceImpact {
 
 		public int ScorePoint { get { return scorePoint; } }
 
-		public override void DisableElement() {
-			base.DisableElement();
+		public override void DisableElement(bool showVFX = true) {
+			base.DisableElement(showVFX);
+
+			if (!showVFX)
+				return;
+
 			ShowExplosionFX();
 		}
 
@@ -97,7 +131,8 @@ namespace SpaceImpact {
 		}
 
 		public virtual void SetHP(int hp) {
-			healthPoints = hp;
+			this.healthPoints = hp;
+			this.healthPoints = Mathf.Clamp(this.healthPoints, 0, int.MaxValue);
 		}
 
 		public void AddScorePoint(int score) {
@@ -111,11 +146,17 @@ namespace SpaceImpact {
 		}
 
 		public virtual void SetScorePoint(int score) {
-			scorePoint = score;
+			this.scorePoint = score;
+			this.scorePoint = Mathf.Clamp(this.scorePoint, 0, int.MaxValue);
 		}
 
 		public void SetInvulnerability(bool invulnerable) {
 			this.invulnerable = invulnerable;
+
+			if (invulnerableVFX == null)
+				return;
+
+			invulnerableVFX.gameObject.SetActive(this.invulnerable);
 		}
 
 		public override void  ResetElement() {
@@ -125,5 +166,13 @@ namespace SpaceImpact {
 			scorePoint = originalScorePoint;
 			invulnerable = originalInvulnerable;
 		}
+
+# if UNITY_EDITOR
+		private void OnDrawGizmos() {
+			for (int i = 0; i < elementMover.Count; i++) {
+				elementMover[i].DrawGizmos();
+			}
+		}
+# endif
 	}
 }

@@ -18,6 +18,8 @@ namespace SpaceImpact {
 
 		public float MoveSpeed { get { return moveSpeed; } }
 
+		public bool IsElementActive { get { return gameObject.activeInHierarchy; } }
+
 		public virtual void Awake() {
 			rBody2D = GetComponent<Rigidbody2D>();
 			col2D = GetComponent<Collider2D>();
@@ -40,14 +42,14 @@ namespace SpaceImpact {
 		}
 
 		public void Update() {
+			if (OnElementConstraint()) {
+				DisableElement(false);
+			}
+
 			if (!IsElementVisible())
 				return;
 
 			OnElementUpdate();
-
-			if (OnElementConstraint()) {
-				DisableElement();
-			}
 		}
 
 		public bool IsElementVisible() {
@@ -64,26 +66,27 @@ namespace SpaceImpact {
 		}
 
 		public void AddSpeed(float spd) {
-			moveSpeed += spd;
+			this.moveSpeed += spd;
 		}
 
 		public void SubtractSpeed(float spd) {
-			moveSpeed -= spd;
+			this.moveSpeed -= spd;
 		}
 
 		public void SetSpeed(float spd) {
-			moveSpeed = spd;
+			this.moveSpeed = spd;
+			this.moveSpeed = Mathf.Clamp(this.moveSpeed, 0, int.MaxValue);
 		}
 
 		public void EnableElement() {
-			if (gameObject.activeInHierarchy)
+			if (IsElementActive)
 				return;
 
 			gameObject.SetActive(true);
 		}
 
-		public virtual void DisableElement() {
-			if (!gameObject.activeInHierarchy)
+		public virtual void DisableElement(bool showVFX = true) {
+			if (!IsElementActive)
 				return;
 
 			gameObject.SetActive(false);

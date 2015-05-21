@@ -22,7 +22,7 @@ namespace SpaceImpact {
 
 		# region Game Element
 		public override string OBJECT_ID {
-			get { return SICObjectPoolName.OBJECT_GAME_BOSS; }
+			get { return SICObjectPoolName.OBJECT_ENEMY; }
 		}
 		# endregion
 

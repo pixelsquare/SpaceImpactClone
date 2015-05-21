@@ -5,7 +5,8 @@ namespace SpaceImpact {
 
 	public enum ParticleType {
 		NONE = 0,
-		UNIT_EXPLOSION = 1
+		UNIT_EXPLOSION = 1,
+		UNIT_INVULNERABILITY = 2
 	}
 
 	public class SICGameParticle : SICGameElement {

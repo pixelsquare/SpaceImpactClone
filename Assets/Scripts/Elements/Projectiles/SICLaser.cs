@@ -83,7 +83,6 @@ namespace SpaceImpact {
 				(endPoint.x + Mathf.Abs(origin.position.x)) :
 				(endPoint.x - Mathf.Abs(origin.position.x));
 
-			//Debug.Log(Vector3.right * rayLength);
 			RaycastHit2D[] objHit = Physics2D.RaycastAll(origin.position, Vector3.right, rayLength, 
 				1 << SICLayerManager.EnemyLayer | 1 << SICLayerManager.BossLayer | 1 << SICLayerManager.ShipLayer);
 
@@ -93,7 +92,6 @@ namespace SpaceImpact {
 			for (int i = 0; i < objHit.Length; i++) {
 				SICGameUnit unit = objHit[i].transform.GetComponent<SICGameUnit>();
 				if (unit != null) {
-					Debug.Log(unit.GetUnitType());
 					if (unit.GetUnitType() == TargetType) {
 						if (TargetType == UnitType.ENEMY) {
 							SICGameEnemy enemyElement = objHit[i].transform.GetComponent<SICGameEnemy>();
@@ -105,7 +103,7 @@ namespace SpaceImpact {
 
 						if (TargetType == UnitType.SPACE_SHIP) {
 							unit.SubtractHP(1);
-							SICGameManager.SharedInstance.ResetSpaceShip();
+							SICGameManager.SharedInstance.RespawnShip();
 						}
 					}
 				}

@@ -56,6 +56,9 @@
      <Compile Include="Assets\Scripts\Elements\Enemies\SICEnemy1.cs" />
      <Compile Include="Assets\Scripts\Elements\Particles\Base\SICGameParticle.cs" />
      <Compile Include="Assets\Scripts\Elements\Particles\SICExplode.cs" />
+     <Compile Include="Assets\Scripts\Elements\Particles\SICInvulnerable.cs" />
+     <Compile Include="Assets\Scripts\Elements\Powerup\Base\SICGamePowerup.cs" />
+     <Compile Include="Assets\Scripts\Elements\Powerup\SICPowerup.cs" />
      <Compile Include="Assets\Scripts\Elements\Projectiles\Base\SICProjectiles.cs" />
      <Compile Include="Assets\Scripts\Elements\Projectiles\SICBeam.cs" />
      <Compile Include="Assets\Scripts\Elements\Projectiles\SICLaser.cs" />
@@ -74,10 +77,13 @@
      <Compile Include="Assets\Scripts\Stage\Base\SICGameStage.cs" />
      <Compile Include="Assets\Scripts\Stage\SICStage1.cs" />
      <Compile Include="Assets\Scripts\Stage\SICStage2.cs" />
+     <Compile Include="Assets\Scripts\Utility\SICAgent.cs" />
      <Compile Include="Assets\Scripts\Utility\SICAreaBounds.cs" />
      <Compile Include="Assets\Scripts\Utility\SICCamera.cs" />
      <Compile Include="Assets\Scripts\Utility\SICCameraMover.cs" />
+     <Compile Include="Assets\Scripts\Utility\SICElementMover.cs" />
      <Compile Include="Assets\Scripts\Utility\SICGameSettings.cs" />
+     <Compile Include="Assets\Scripts\Utility\SICUnitFiring.cs" />
      <None Include="Assets\Version Number.txt" />
      <None Include="Assets\Space Impact Placeholder.txt" />
  <Reference Include="UnityEngine.UI">

@@ -3,6 +3,11 @@ using System.Collections;
 
 namespace SpaceImpact {
 
+	public enum CameraMoverState {
+		IDLE = 0,
+		MOVING = 1
+	}
+
 	public class SICCameraMover : MonoBehaviour {
 		// Public Variables	
 		[SerializeField] private float cameraSpeed = 5f;
@@ -16,10 +21,14 @@ namespace SpaceImpact {
 		private float startTime;
 		private float totalDistance;
 
+		private CameraMoverState cameraState;
+
 		// Static Variables
 
 		public Transform From { get { return from; } }
 		public Transform To { get { return to; } }
+
+		public CameraMoverState CameraState { get { return cameraState; } } 
 
 		public void Initialize(Transform from, Transform to) {
 			this.from = from;
@@ -30,10 +39,11 @@ namespace SpaceImpact {
 
 			startTime = Time.time;
 			totalDistance = Vector3.Distance(fromLocation, toLocation);
+			SetCameraState(CameraMoverState.IDLE);
 		}
 
 		public void Update() {
-			if (from == null || to == null)
+			if (from == null || to == null || cameraState == CameraMoverState.IDLE)
 				return;
 
 			float moveSpeed = (Time.time - startTime) * cameraSpeed;
@@ -48,10 +58,21 @@ namespace SpaceImpact {
 
 			startTime = 0f;
 			totalDistance = 0f;
+			cameraState = CameraMoverState.IDLE;
 		}
 
 		public void SetCameraSpeed(float spd) {
 			cameraSpeed = spd;
+		}
+
+		public void SetCameraState(CameraMoverState state) {
+			if (cameraState == state)
+				return;
+
+			cameraState = state;
+			if (cameraState == CameraMoverState.MOVING) {
+				startTime = Time.time;
+			}
 		}
 	}
 }

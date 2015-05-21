@@ -8,7 +8,6 @@ namespace SpaceImpact {
 
 	public class SICSpaceShip : SICGameUnit {
 		// Public Variables	
-		[SerializeField] private float invlunerabilityDuration = 3f;
 
 		// Private Variables
 		private ProjectileType defaultProjectile;
@@ -32,7 +31,6 @@ namespace SpaceImpact {
 		public override void OnEnable() {
 			base.OnEnable();
 			defaultProjectile = ProjectileType.MISSILE;
-			//StartCoroutine(Invulnerability());
 		}
 
 		public override void SetHP(int hp) {
@@ -55,7 +53,10 @@ namespace SpaceImpact {
 			ShipMovement();
 			ShipFiring();
 			ClampShipToArea();
+
+# if UNITY_EDITOR
 			ProjectileTest();
+# endif
 		}
 
 		private void ShipFiring() {
@@ -63,7 +64,7 @@ namespace SpaceImpact {
 				FireProjectile(defaultProjectile, Vector3.right, UnitType.ENEMY);
 			}
 
-			if (Input.GetButtonDown("Fire1")) {
+			if (Input.GetButtonDown("Fire Special")) {
 				if (specialCount <= 0)
 					return;
 
@@ -76,6 +77,10 @@ namespace SpaceImpact {
 			Vector3 targetPos = new Vector3(SICAreaBounds.ThisT.position.x, SICAreaBounds.ThisT.position.y, 0f);
 			horiz += Input.GetAxisRaw("Horizontal") * MoveSpeed * Time.deltaTime;
 			vert += Input.GetAxisRaw("Vertical") * MoveSpeed * Time.deltaTime;
+
+			// Clamp keys to screen bounds
+			horiz = Mathf.Clamp(horiz, SICAreaBounds.PtLowerLeft.x + (MainTexture.bounds.size.x / 2), SICAreaBounds.PtLowerRight.x - (MainTexture.bounds.size.x / 2));
+			vert = Mathf.Clamp(vert, SICAreaBounds.PtLowerLeft.y + (MainTexture.bounds.size.y / 2), SICAreaBounds.PtUpperLeft.y - (MainTexture.bounds.size.y / 2));
 
 			transform.position = targetPos + new Vector3(horiz, vert, 0f);
 		}
@@ -139,9 +144,13 @@ namespace SpaceImpact {
 			transform.position = targetPos + new Vector3(horiz, vert, 0f);
 		}
 
-		private IEnumerator Invulnerability() {
+		public void EnableInvulnerability(float duration = 1) {
+			StartCoroutine(Invulnerability(duration));
+		}
+
+		private IEnumerator Invulnerability(float time) {
 			SetInvulnerability(true);
-			yield return new WaitForSeconds(invlunerabilityDuration);
+			yield return new WaitForSeconds(time);
 			SetInvulnerability(false);
 
 		}

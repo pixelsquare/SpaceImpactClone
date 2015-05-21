@@ -18,16 +18,21 @@ namespace SpaceImpact {
 
 		public static SICObjectPoolManager SharedInstance { get { return instance; } }
 
+		public List<ObjectPooled> ObjParents { get { return objParents; } }
+
 		public class ObjectPooled {
 			public Transform refObjParent;
 			public SICGameElement refObj;
 			public List<GameObject> objectList;
 
-			public void AddObject(GameObject obj) {
+			public void AddObject(GameObject obj, bool AddToParent = true) {
 				if (objectList.Contains(obj))
 					return;
 
-				obj.transform.parent = refObjParent.transform;
+				if (AddToParent) {
+					obj.transform.parent = refObjParent.transform;
+				}
+
 				objectList.Add(obj);
 			}
 
@@ -61,18 +66,6 @@ namespace SpaceImpact {
 				pooledObj.objectList = new List<GameObject>();
 				pooledObj.GetObject();
 				objParents.Add(pooledObj);
-			}
-		}
-
-		public void AddAllElementsToPool() {
-			SICGameElement[] allElements = GameObject.FindObjectsOfType<SICGameElement>();
-
-			for (int i = 0; i < allElements.Length; i++) {
-				for (int j = 0; j < objParents.Count; j++) {
-					if (allElements[i].OBJECT_ID == objParents[j].refObj.OBJECT_ID) {
-						objParents[j].AddObject(allElements[i].gameObject);
-					}
-				}
 			}
 		}
 
@@ -175,13 +168,28 @@ namespace SpaceImpact {
 
 			return null;
 		}
+		public GameObject GetObject(string id, PowerupType type) {
+			for (int i = 0; i < objParents.Count; i++) {
+				if (objParents[i].refObj.OBJECT_ID == id) {
+					SICGamePowerup powerup = objParents[i].refObj.GetComponent<SICGamePowerup>();
+					if (powerup != null) {
+						if (powerup.GetPowerupType() == type) {
+							return objParents[i].GetObject();
+						}
+					}
+				}
+			}
 
-		public ObjectPooled GetParent(string id) {
-			return objParents.Find(parent => parent.refObj.OBJECT_ID == id);
+			return null;
 		}
+
 
 		public List<ObjectPooled> GetParents(string id) {
 			return objParents.FindAll(parent => parent.refObj.OBJECT_ID == id);
+		}
+
+		public ObjectPooled GetParent(string id) {
+			return objParents.Find(parent => parent.refObj.OBJECT_ID == id);
 		}
 
 		public ObjectPooled GetParent(string id, StageType type) {
@@ -208,12 +216,16 @@ namespace SpaceImpact {
 			return objParents.Find(parent => parent.refObj.OBJECT_ID == id && (parent.refObj as SICGameUnit).GetUnitType() == type);
 		}
 
+		public ObjectPooled GetParent(string id, PowerupType type) {
+			return objParents.Find(parent => parent.refObj.OBJECT_ID == id && (parent.refObj as SICGamePowerup).GetPowerupType() == type);
+		}
+
 		public void ResetAllParents() {
 			for (int i = 0; i < objParents.Count; i++) {
 				for (int j = 0; j < objParents[i].objectList.Count; j++) {
 					SICGameElement element = objParents[i].objectList[j].GetComponent<SICGameElement>();
 					if (element != null) {
-						element.DisableElement();
+						element.DisableElement(false);
 					}
 				}
 			}

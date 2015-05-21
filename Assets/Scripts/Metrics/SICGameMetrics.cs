@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using SpaceImpact.Utility;
+using SpaceImpact.GameCore;
 
 namespace SpaceImpact {
 
@@ -17,6 +18,13 @@ namespace SpaceImpact {
 		private Dictionary<string, string> metricsData;
 
 		// Static Variables
+
+		public const string UI_LIVES_FORMAT = "LIVES: {0}";
+		public const string UI_SPECIAL_FORMAT = "{0} {1}";
+		public const string UI_SCORE_FORMAT = "SCORE: {0}";
+
+		public const string UI_SPECIAL_VALUE_FORMAT = "00";
+		public const string UI_SCORE_VALUE_FORMAT = "000000";
 
 		public void Awake() {
 			metricsData = new Dictionary<string, string>();
@@ -70,6 +78,7 @@ namespace SpaceImpact {
 
 		public void SetScore(int score) {
 			this.score = score;
+			SICGameManager.SharedInstance.SetScoreUIText(string.Format(UI_SCORE_FORMAT, score.ToString(UI_SCORE_VALUE_FORMAT)));
 
 			if (metricsData.ContainsKey(SICGameMetricsKey.GAME_SCORE)) {
 				metricsData[SICGameMetricsKey.GAME_SCORE] = this.score.ToString();
@@ -92,6 +101,7 @@ namespace SpaceImpact {
 
 		public void SetLife(int life) {
 			this.lives = life;
+			SICGameManager.SharedInstance.SetLivesUIText(string.Format(UI_LIVES_FORMAT, SICGameUtility.GetLivesIcon(lives)));
 
 			if (metricsData.ContainsKey(SICGameMetricsKey.GAME_LIVES)) {
 				metricsData[SICGameMetricsKey.GAME_LIVES] = this.lives.ToString();
@@ -114,14 +124,20 @@ namespace SpaceImpact {
 
 		public void SetSpecialCount(int count) {
 			specialCount = count;
+			SICGameManager.SharedInstance.SetSpecialUIText(string.Format(UI_SPECIAL_FORMAT, SICGameUtility.GetSpecialIcon(special), specialCount.ToString(UI_SPECIAL_VALUE_FORMAT)));
 
 			if (metricsData.ContainsKey(SICGameMetricsKey.GAME_SPECIAL_COUNT)) {
 				metricsData[SICGameMetricsKey.GAME_SPECIAL_COUNT] = this.specialCount.ToString();
 			}
 		}
 
+		public int GetSpecialCount() {
+			return this.specialCount;
+		}
+
 		public void SetSpecial(ProjectileType specialType) {
 			this.special = specialType;
+			SICGameManager.SharedInstance.SetSpecialUIText(string.Format(UI_SPECIAL_FORMAT, SICGameUtility.GetSpecialIcon(special), specialCount.ToString(UI_SPECIAL_VALUE_FORMAT)));
 
 			if (metricsData.ContainsKey(SICGameMetricsKey.GAME_SPECIAL)) {
 				metricsData[SICGameMetricsKey.GAME_SPECIAL] = this.special.ToString();

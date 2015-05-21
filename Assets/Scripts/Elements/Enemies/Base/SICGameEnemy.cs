@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using SpaceImpact.GameCore;
+using System.Collections.Generic;
+using SpaceImpact.Utility;
 
 namespace SpaceImpact {
 
@@ -12,15 +14,11 @@ namespace SpaceImpact {
 
 	public class SICGameEnemy : SICGameUnit {
 		// Public Variables	
-		[SerializeField] private bool canFire;
-		[SerializeField] private float fireRate;
-		[SerializeField] private ProjectileType type;
+		[SerializeField] private List<SICUnitFiring> unitFiring;
 
 		// Private Variables
 		private bool isTargetted;
 		private bool hasCollided;
-
-		private float fireTime = 0f;
 
 		// Static Variables
 
@@ -33,12 +31,17 @@ namespace SpaceImpact {
 		}
 
 		public override void OnElementUpdate() {
+			base.OnElementUpdate();
 			transform.Translate(-Vector3.right * MoveSpeed * Time.deltaTime);
-			Fire();
+			UnitFiringUpdate();
 		}
 
-		public override void DisableElement() {
-			base.DisableElement();
+		public override bool OnElementConstraint() {
+			return transform.position.x < SICAreaBounds.MinPosition.x;
+		}
+
+		public override void DisableElement(bool showVFX = true) {
+			base.DisableElement(showVFX);
 		}
 
 		public override string OBJECT_ID {
@@ -46,12 +49,8 @@ namespace SpaceImpact {
 		}
 		# endregion
 
-		public void Fire() {
-			fireTime += Time.deltaTime;
-			if (fireTime >= fireRate) {
-				FireProjectile(type, -Vector3.right, UnitType.SPACE_SHIP);
-				fireTime = 0f;
-			}
+		public void UnitFiringUpdate() {
+			unitFiring.ForEach(a => a.FiringUpdate(FireProjectile, -Vector3.right, UnitType.SPACE_SHIP));
 		}
 
 		public void OnTriggerEnter2D(Collider2D col) {
@@ -64,16 +63,19 @@ namespace SpaceImpact {
 					int subtractedHP = (GetEnemyType() == EnemyType.ENEMY) ? 999 : 1;
 					SubtractHP(subtractedHP);
 					ship.SubtractHP(1);
-					SICGameManager.SharedInstance.ResetSpaceShip();
+
+					if (!ship.IsInvulnerable) {
+						SICGameManager.SharedInstance.RespawnShip();
+					}
 
 					hasCollided = true;
 					ResetElement();
 				}
 
-				SICProjectiles projectile = col.GetComponent<SICProjectiles>();
-				if (projectile != null) {
+				//SICProjectiles projectile = col.GetComponent<SICProjectiles>();
+				//if (projectile != null) {
 
-				}
+				//}
 			}
 		}
 
@@ -93,7 +95,8 @@ namespace SpaceImpact {
 			base.ResetElement();
 			isTargetted = false;
 			hasCollided = false;
-			fireTime = 0f;
+
+			unitFiring.ForEach(a => a.Initialize());
 		}
 	}
 }

@@ -2,15 +2,27 @@
 using System.Collections;
 using SpaceImpact.Utility;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using System.Text;
 
 namespace SpaceImpact.GameCore {
 
 	public class SICGameManager : MonoBehaviour {
 		// Public Variables	
+		[SerializeField] private GameObject mainMenuUi;
+		[SerializeField] private GameObject mainUi;
+		[SerializeField] private GameObject endUi;
+
+		[SerializeField] private Text livesUi;
+		[SerializeField] private Text specialUi;
+		[SerializeField] private Text scoreUI;
+		[SerializeField] private Text endScoreUI;
+
 		[SerializeField] private SICCameraMover cameraMover;
 		[SerializeField] private SICGameMetrics gameMetrics;
 		[SerializeField] private StageType stage;
 		[SerializeField] private List<SICGameStage> refStages;
+		[SerializeField] private float shipInvulerability = 3f;
 
 		// Private Variables	
 		private GameObject spaceShipObj;
@@ -18,6 +30,7 @@ namespace SpaceImpact.GameCore {
 
 		private GameObject stageObj;
 		private SICGameStage curStage;
+
 		private Vector3 shipInitPos;
 
 		// Static Variables
@@ -33,138 +46,243 @@ namespace SpaceImpact.GameCore {
 
 		public List<SICGameStage> RefStages { get { return refStages; } }
 
-		public SICGameStage CurrentStage { get { return curStage; } } 
+		public SICGameStage CurrentStage { get { return curStage; } }
+
+		public Text LivesUI { get { return livesUi; } }
+
+		public Text SpecialUI { get { return specialUi; } }
+
+		public Text ScoreUI { get { return scoreUI; } }
+
+		public Text EndScoreUI { get { return endScoreUI; } }
 
 		private void Awake() {
 			instance = this;
 		}
 
 		private void Start() {
-			gameMetrics.SetLife(SICGameSettings.DEFAULT_LIVES);
-			gameMetrics.SetScore(SICGameSettings.DEFAULT_SCORE);
-			gameMetrics.SetSpecial(SICGameSettings.DEFAULT_SPECIAL);
+			InitStage();
+			shipInitPos = curStage.PStartPosition.position;
+			InitShip();
+			InitCameraMover();
 
-			SetStage(StageType.STAGE_1);
+			mainMenuUi.SetActive(true);
+			mainUi.SetActive(false);
+			endUi.SetActive(false);
 		}
-
-//# if UNITY_EDITOR
-		public void Update() {
-			//if (Input.GetKeyDown(KeyCode.L)) {
-			//    foreach (SICObjectPoolManager.ObjectPooled obj in SICObjectPoolManager.SharedInstance.GetParents(SICObjectPoolName.OBJECT_GAME_STAGE)) {
-			//        Debug.Log(obj.refObjParent.name);
-			//    }
-			//}
-
-			//if (Input.GetKeyDown(KeyCode.N)) {
-			//    ReloadCurrentStage();
-			//}
-
-			if (gameMetrics.GetLives() <= 0) {
-				SetStage(StageType.NONE);
-			}
-
-			LevelsTest();
-		}
-//# endif
 
 		public void LoadStage(StageType stageType) {
-			if (curStage != null) {
-				curStage.DisableElement();
-			}
-
-			stageObj = SICObjectPoolManager.SharedInstance.GetObject(GetStage(stageType).OBJECT_ID, stageType);
-			if (stageObj != null) {
-				curStage = stageObj.GetComponent<SICGameStage>();
-				curStage.EnableElement();
-
-				cameraMover.Initialize(curStage.PointA, curStage.PointB);
-			}
-
-			shipInitPos = curStage.PStartPosition.position;
-			InitializeSpaceShip();
-			ResetSpaceShip();
-		}
-
-		public void ResetStage() {
-			curStage.ResetStage();
-
-			ResetSpaceShip();
-			cameraMover.ResetCameraMover();
-		}
-
-		public void ClearStage() {
-			spaceShip.DisableElement();
-			curStage.DisableElement();
-			cameraMover.ResetCameraMover();
-			SICObjectPoolManager.SharedInstance.ResetAllParents();
-		}
-
-		public void ReloadCurrentStage() {
-			ResetStage();
-			LoadStage(stage);
-		}
-
-		public void InitializeSpaceShip() {
-			if (spaceShipObj != null && spaceShipObj.activeInHierarchy)
-				return;
-
-			spaceShipObj = SICObjectPoolManager.SharedInstance.GetObject(SICObjectPoolName.OBJECT_SPACE_SHIP);
-		}
-
-		public void ResetSpaceShip() {
-			if (spaceShipObj != null && spaceShip == null) {
-				spaceShip = spaceShipObj.GetComponent<SICSpaceShip>();
-			}
-
-
-			spaceShip.SetSpecial(ProjectileType.NONE);
-			spaceShip.SetSpecial(SICGameSettings.DEFAULT_SPECIAL);
-			spaceShip.SetHP(gameMetrics.GetLives());
-			spaceShip.SetPosition(shipInitPos);
-			spaceShip.EnableElement();
-		}
-
-		public SICGameStage GetStage(StageType stageType) {
-			return refStages.Find(a => a.GetStageType() == stageType);
-		}
-
-		public void SetStage(StageType stageType) {
 			if (stage == stageType)
 				return;
 
 			stage = stageType;
+			mainMenuUi.SetActive(false);
+			mainUi.SetActive(true);
+			endUi.SetActive(false);
 
 			if (stage == StageType.NONE) {
 				ClearStage();
 				return;
 			}
 
-			LoadStage(stage);
+			if (curStage != null) {
+				curStage.DisableElement();
+			}
+
+			stageObj = SICObjectPoolManager.SharedInstance.GetObject(SICObjectPoolName.OBJECT_GAME_STAGE, stageType);
+			if (stageObj == null) {
+				Restart();
+				return;
+			}
+			else {
+				curStage = stageObj.GetComponent<SICGameStage>();
+			}
+
+			InitCameraMover();
+			SetElementsActive(true);
+			RespawnShip();
+		}
+
+		public void LoadFirstLevel() {
+			LoadStage(StageType.STAGE_1);
+		}
+
+		public void Restart() {
+			LoadStage(StageType.NONE);
+			InitShip();
+			mainMenuUi.SetActive(true);
+			endUi.SetActive(false);
+			mainUi.SetActive(false);
+		}
+
+		public void ExitApplication() {
+			Application.Quit();
+		}
+
+		public void InitShip() {
+			// Initialize Space Ship
+			spaceShipObj = SICObjectPoolManager.SharedInstance.GetObject(SICObjectPoolName.OBJECT_SPACE_SHIP);
+
+			if (spaceShipObj == null)
+				return;
+
+			spaceShip = spaceShipObj.GetComponent<SICSpaceShip>();
+			spaceShip.SetHP(SICGameSettings.DEFAULT_LIVES);
+			spaceShip.SetScorePoint(SICGameSettings.DEFAULT_SCORE);
+			spaceShip.SetSpecial(ProjectileType.NONE);
+			spaceShip.SetSpecial(SICGameSettings.DEFAULT_SPECIAL);
+			spaceShip.SetPosition(shipInitPos);
+		}
+
+		public void ResetShip() {
+			if (spaceShip == null)
+				return;
+
+			spaceShip.SetPosition(shipInitPos);
+		}
+
+		public void InitStage() {
+			// Initialize Game Stage
+			stageObj = SICObjectPoolManager.SharedInstance.GetObject(SICObjectPoolName.OBJECT_GAME_STAGE);
+			if (stageObj == null)
+				return;
+
+			curStage = stageObj.GetComponent<SICGameStage>();
+		}
+
+		public void ResetStage() {
+			if (curStage == null)
+				return;
+
+			curStage.ResetStage();
+		}
+
+		public void InitCameraMover() {
+			// Initialize Camera Mover
+			if (curStage == null)
+				return;
+
+			cameraMover.Initialize(curStage.PointA, curStage.PointB);
+		}
+
+		public void ResetCameraMover() {
+			if (cameraMover == null)
+				return;
+
+			cameraMover.ResetCameraMover();
+		}
+
+		public void ClearStage() {
+			ResetCameraMover();
+			ResetStage();
+			ResetShip();
+
+			SetElementsActive(false);
+		}
+
+		public void ReloadStage() {
+			ResetCameraMover();
+			ResetStage();
+
+			InitCameraMover();
+			SetElementsActive(true);
+			spaceShip.DisableElement();
+			RespawnShip();
+		}
+
+		public void RespawnShip() {
+			if (spaceShip.IsInvulnerable)
+				return;
+
+			// Load Nothing if ship is not available
+			if (gameMetrics.GetLives() <= 0) {
+				LoadStage(StageType.NONE);
+				GameEnd();
+				return;
+			}
+
+			ResetShip();
+			spaceShip.EnableElement();
+			spaceShip.EnableInvulnerability(shipInvulerability);
+		}
+
+		public void SetElementsActive(bool active) {
+			if (active) {
+				curStage.EnableElement();
+				spaceShip.EnableElement();
+				cameraMover.SetCameraState(CameraMoverState.MOVING);
+			}
+			else {
+				curStage.DisableElement();
+				spaceShip.DisableElement(false);
+				cameraMover.SetCameraState(CameraMoverState.IDLE);
+			}
+		}
+
+		public void GameEnd() {
+			mainMenuUi.SetActive(false);
+			mainUi.SetActive(false);
+			endUi.SetActive(true);
+			SetEndScoreUIText(gameMetrics.GetScore().ToString(SICGameMetrics.UI_SCORE_VALUE_FORMAT));
+		}
+
+# if UNITY_EDITOR
+		public void Update() {
+			LevelsTest();
+		}
+#endif
+
+		public void SetScoreUIText(string text) {
+			scoreUI.text = text;
+		}
+
+		public void SetLivesUIText(string text) {
+			livesUi.text = text;
+		}
+
+		public void SetSpecialUIText(string text) {
+			specialUi.text = text;
+		}
+
+		public void SetEndScoreUIText(string text) {
+			endScoreUI.text = text;
 		}
 
 		public void LevelsTest() {
 			if (Input.GetKeyDown(KeyCode.F1)) {
-				SetStage(StageType.STAGE_1);
+				LoadStage(StageType.STAGE_1);
 			}
 
 			if (Input.GetKeyDown(KeyCode.F2)) {
-				SetStage(StageType.STAGE_2);
+				LoadStage(StageType.STAGE_2);
 			}
 
 			if (Input.GetKeyDown(KeyCode.F3)) {
-				SetStage(StageType.STAGE_3);
+				LoadStage(StageType.STAGE_3);
 			}
 
 			if (Input.GetKeyDown(KeyCode.F4)) {
-				SetStage(StageType.STAGE_4);
+				LoadStage(StageType.STAGE_4);
 			}
 
 			if (Input.GetKeyDown(KeyCode.F5)) {
-				SetStage(StageType.STAGE_5);
+				LoadStage(StageType.STAGE_5);
 			}
 
 			if (Input.GetKeyDown(KeyCode.Home)) {
-				SetStage(StageType.NONE);
+				LoadStage(StageType.NONE);
+			}
+
+			if (Input.GetKeyDown(KeyCode.R)) {
+				ReloadStage();
+			}
+
+			if (Input.GetKeyDown(KeyCode.P)) {
+				RespawnShip();
+			}
+
+			if (Input.GetKeyDown(KeyCode.T)) {
+				InitShip();
 			}
 		}
 	}
