@@ -7,7 +7,13 @@ namespace SpaceImpact {
 
 	public class SICGameUtility {
 		public static List<GameObject> GetAllVisibleEnemies() {
-			return SICObjectPoolManager.SharedInstance.GetParent(SICObjectPoolName.OBJECT_ENEMY).objectList.FindAll(a => (a.GetComponent<SICGameElement>()).IsElementVisible());
+			List<GameObject> result = new List<GameObject>();
+
+			foreach (SICObjectPoolManager.ObjectPooled pooled in SICObjectPoolManager.SharedInstance.GetParents(SICObjectPoolName.OBJECT_ENEMY)) {
+				result.AddRange(pooled.objectList.FindAll(a => (a.GetComponent<SICGameElement>()).IsElementVisible() && a.activeInHierarchy));
+			}
+
+			return result;
 		}
 
 		public static Transform GetRandomEnemy() {
@@ -164,6 +170,17 @@ namespace SpaceImpact {
 				}
 
 				GetEnemyRecursively(obj, ref elements);
+			}
+		}
+
+		public static void GetUnitRecursively(Transform root, ref List<SICGameUnit> elements) {
+			foreach (Transform obj in root) {
+				SICGameUnit unit = obj.GetComponent<SICGameUnit>();
+				if (unit != null) {
+					elements.Add(unit);
+				}
+
+				GetUnitRecursively(obj, ref elements);
 			}
 		}
 	}

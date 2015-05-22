@@ -16,34 +16,34 @@ namespace SpaceImpact {
 		# region Game Element
 
 		public override void Awake() {
-			base.Awake();
+		    base.Awake();
 
-			agentOriginalPos = new List<Vector3>();
+		    agentOriginalPos = new List<Vector3>();
 
-			if (agents.Length <= 0)
-				return;
+		    if (agents.Length <= 0)
+		        return;
 
-			for (int i = 0; i < agents.Length; i++) {
-				agentOriginalPos.Add(transform.root.position + agents[i].transform.position);
-			}
+		    for (int i = 0; i < agents.Length; i++) {
+		        agentOriginalPos.Add(transform.root.position + agents[i].transform.position);
+		    }
 		}
 
 		public override void OnEnable() {
-			base.OnEnable();
-			ResetFX();
+		    base.OnEnable();
+		    ResetFX();
 		}
 
 		public override ParticleType GetParticleType() {
-			return ParticleType.UNIT_INVULNERABILITY;
+		    return ParticleType.UNIT_INVULNERABILITY;
 		}
 
 		# endregion
 
 		public void ResetFX() {
-			for (int i = 0; i < agents.Length; i++) {
-				agents[i].transform.position = agentOriginalPos[i];
-				agents[i].SetAgentSpeed(MoveSpeed);
-			}
+		    for (int i = 0; i < agents.Length; i++) {
+		        agents[i].transform.position = agentOriginalPos[i];
+		        agents[i].SetAgentSpeed(MoveSpeed);
+		    }
 		}
 	}
 }

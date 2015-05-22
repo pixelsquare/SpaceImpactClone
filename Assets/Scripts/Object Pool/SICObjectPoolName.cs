@@ -12,6 +12,7 @@ namespace SpaceImpact {
 		public const string OBJECT_PROJECTILE = "Projectile";
 		public const string OBJECT_SPACE_SHIP = "Space Ship";
 		public const string OBJECT_ENEMY = "Enemy";
+		public const string OBJECT_POWERUP = "Powerup";
 
 		public const string OBJECT_PARTICLE = "Particle";
 	}

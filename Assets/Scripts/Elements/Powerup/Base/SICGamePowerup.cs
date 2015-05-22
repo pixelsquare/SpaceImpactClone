@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using SpaceImpact.Utility;
 
 namespace SpaceImpact {
 
@@ -18,6 +19,21 @@ namespace SpaceImpact {
 		// Private Variables	
 
 		// Static Variables
+
+		# region Game Element
+		public override void OnElementUpdate() {
+			base.OnElementUpdate();
+			transform.Translate(-Vector3.right * MoveSpeed * Time.deltaTime);
+		}
+
+		public override bool OnElementConstraint() {
+			return transform.position.x < SICAreaBounds.MinPosition.x;
+		}
+
+		public override string OBJECT_ID {
+			get { return SICObjectPoolName.OBJECT_POWERUP; }
+		}
+		# endregion
 
 		# region Game Unit
 		public override UnitType GetUnitType() {

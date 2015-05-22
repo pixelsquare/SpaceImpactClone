@@ -21,7 +21,10 @@ namespace SpaceImpact {
 
 		// Private Variables
 		private List<Vector3> elementPos;
+
 		private List<SICGameElement> stageElements;
+		private List<SICGameEnemy> stageEnemies;
+		private List<SICGameUnit> stageUnits;
 
 		private SICGameBoss stageBoss;
 
@@ -53,10 +56,13 @@ namespace SpaceImpact {
 			if (stageElements.Count <= 0)
 				return;
 
-			List<SICGameEnemy> enemyList = new List<SICGameEnemy>();
-			SICGameUtility.GetEnemyRecursively(transform, ref enemyList);
+			stageUnits = new List<SICGameUnit>();
+			SICGameUtility.GetUnitRecursively(transform, ref stageUnits);
 
-			stageBoss = enemyList.Find(a => a.GetEnemyType() == EnemyType.BOSS) as SICGameBoss;
+			stageEnemies = new List<SICGameEnemy>();
+			SICGameUtility.GetEnemyRecursively(transform, ref stageEnemies);
+
+			stageBoss = stageEnemies.Find(a => a.GetEnemyType() == EnemyType.BOSS) as SICGameBoss;
 
 			for (int i = 0; i < stageElements.Count; i++) {
 				elementPos.Add(stageElements[i].transform.position);
@@ -83,6 +89,66 @@ namespace SpaceImpact {
 					if (!stageElements[i].IsElementActive)
 						continue;
 
+					SICGameElement reference = SICObjectPoolManager.SharedInstance.ObjParents[j].refObj;
+					SICGameElement obj = stageElements[i];
+
+					SICGameStage refStage = reference.GetComponent<SICGameStage>();
+					SICGameStage objStage = obj.GetComponent<SICGameStage>();
+					if (refStage != null && objStage != null) {
+						if (refStage.GetStageType() != objStage.GetStageType()) {
+							continue;
+						}
+					}
+
+					SICGameProjectile refProjectile = reference.GetComponent<SICGameProjectile>();
+					SICGameProjectile objProjectile = obj.GetComponent<SICGameProjectile>();
+					if (refProjectile != null && objProjectile != null) {
+						if (refProjectile.GetProjectileType() != objProjectile.GetProjectileType()) {
+							continue;
+						}
+					}
+
+					SICGameBoss refBoss = reference.GetComponent<SICGameBoss>();
+					SICGameBoss objBoss = obj.GetComponent<SICGameBoss>();
+					if (refBoss != null && objBoss != null) {
+						if (refBoss.GetBossType() != objBoss.GetBossType()) {
+							continue;
+						}
+					}
+
+					SICGameParticle refParticle = reference.GetComponent<SICGameParticle>();
+					SICGameParticle objParticle = obj.GetComponent<SICGameParticle>();
+					if (refParticle != null && objParticle != null) {
+						if (refParticle.GetParticleType() != objParticle.GetParticleType()) {
+							continue;
+						}
+					}
+
+					SICGameEnemy refEnemy = reference.GetComponent<SICGameEnemy>();
+					SICGameEnemy objEnemy = obj.GetComponent<SICGameEnemy>();
+					if (refEnemy != null && objEnemy != null) {
+						if (refEnemy.GetEnemyType() != objEnemy.GetEnemyType()) {
+							continue;
+						}
+					}
+
+					SICGameUnit refUnit = reference.GetComponent<SICGameUnit>();
+					SICGameUnit objUnit = obj.GetComponent<SICGameUnit>();
+					if (refUnit != null && objUnit != null) {
+						if (refUnit.GetUnitType() != objUnit.GetUnitType()) {
+							continue;
+						}
+					}
+
+					SICGamePowerup refPowerup = reference.GetComponent<SICGamePowerup>();
+					SICGamePowerup objPowerup = obj.GetComponent<SICGamePowerup>();
+					if (refPowerup != null && objPowerup != null) {
+						if (refPowerup.GetPowerupType() != objPowerup.GetPowerupType()) {
+							continue;
+						}
+					}
+
+					// Does not include the type
 					if (stageElements[i].OBJECT_ID == SICObjectPoolManager.SharedInstance.ObjParents[j].refObj.OBJECT_ID) {
 						SICObjectPoolManager.SharedInstance.ObjParents[j].AddObject(stageElements[i].gameObject, false);
 					}

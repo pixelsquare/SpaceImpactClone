@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using SpaceImpact.Utility;
+using SpaceImpact.GameCore;
 
 namespace SpaceImpact {
 
-	public class SICMissile : SICProjectiles {
+	public class SICMissile : SICGameProjectile {
 
 		# region Projectiles
 		public override void Initialize(Transform owner, Transform sender) {
@@ -30,7 +31,7 @@ namespace SpaceImpact {
 		public override void OnTriggerEnter2D(Collider2D col) {
 			base.OnTriggerEnter2D(col);
 			if (col.gameObject.layer == SICLayerManager.ProjectileLayer) {
-				SICProjectiles projectileElement = col.GetComponent<SICProjectiles>();
+				SICGameProjectile projectileElement = col.GetComponent<SICGameProjectile>();
 
 				if (projectileElement == null)
 					return;
@@ -44,6 +45,7 @@ namespace SpaceImpact {
 					return;
 
 				projectileElement.SubtractDurability(999);
+				SICGameManager.SharedInstance.GameMetrics.AddScore(projectileElement.ScorePoint);
 				SubtractDurability(999);
 				ShowExplosionFX();
 			}

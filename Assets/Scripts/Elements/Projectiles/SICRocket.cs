@@ -5,7 +5,7 @@ using SpaceImpact.GameCore;
 
 namespace SpaceImpact {
 
-	public class SICRocket : SICProjectiles {
+	public class SICRocket : SICGameProjectile {
 		// Public Variables
 		[SerializeField] private float waveLength = 1f;
 		[SerializeField] private float amplitude = 5f;

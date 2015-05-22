@@ -4,6 +4,13 @@ using SpaceImpact.Utility;
 
 namespace SpaceImpact {
 
+	public enum ElementType {
+		NONE = 0,
+		UNIT = 1,
+		PROJECTILE = 2,
+		PARTICLE = 3
+	}
+
 	public abstract class SICGameElement : MonoBehaviour {
 		// Public Variables	
 		[SerializeField] private float moveSpeed = 5f;
@@ -52,7 +59,7 @@ namespace SpaceImpact {
 			OnElementUpdate();
 		}
 
-		public bool IsElementVisible() {
+		public virtual bool IsElementVisible() {
 			return !(transform.position.x < SICAreaBounds.MinExPosition.x || transform.position.x > SICAreaBounds.MaxExPosition.x) &&
 				!(transform.position.y < SICAreaBounds.MinExPosition.y || transform.position.y > SICAreaBounds.MaxExPosition.y);
 		}
@@ -92,11 +99,15 @@ namespace SpaceImpact {
 			gameObject.SetActive(false);
 		}
 
+		public virtual ElementType GetElementType() {
+			return ElementType.NONE;
+		}
+
 		public virtual void ShowExplosionFX() {
 			GameObject explodeObj = SICObjectPoolManager.SharedInstance.GetObject(SICObjectPoolName.OBJECT_PARTICLE, ParticleType.UNIT_EXPLOSION);
 			if (explodeObj != null) {
 				explodeObj.transform.position = transform.position;
-				SICGameElement explode = explodeObj.GetComponent<SICGameElement>();
+				SICGameParticle explode = explodeObj.GetComponent<SICGameParticle>();
 				explode.EnableElement();
 			}
 		}

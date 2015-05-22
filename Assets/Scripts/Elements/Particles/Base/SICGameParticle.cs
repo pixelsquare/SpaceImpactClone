@@ -22,6 +22,10 @@ namespace SpaceImpact {
 		}
 		# endregion
 
+		public override ElementType GetElementType() {
+			return  ElementType.PARTICLE;
+		}
+
 		public virtual ParticleType GetParticleType() {
 			return ParticleType.NONE;
 		}

@@ -19,7 +19,7 @@ namespace SpaceImpact {
 		[SerializeField] private bool invulnerable;
 		[SerializeField] private SICInvulnerable invulnerableVFX;
 		[SerializeField] private Transform projectileNozzle;
-		[SerializeField] private List<SICProjectiles> refProjectiles;
+		[SerializeField] private List<SICGameProjectile> refProjectiles;
 		[SerializeField] private List<SICElementMover> elementMover;
 
 		// Private Variables	
@@ -54,8 +54,8 @@ namespace SpaceImpact {
 
 		public override void OnEnable() {
 			base.OnEnable();
-			SetInvulnerability(invulnerable);
 			curMove = 0;
+			SetInvulnerability(invulnerable);
 		}
 
 		public override void OnElementUpdate() {
@@ -79,13 +79,17 @@ namespace SpaceImpact {
 		}
 		# endregion
 
+		public override ElementType GetElementType() {
+			return ElementType.UNIT;
+		}
+
 		public void FireProjectile(ProjectileType type, Vector3 direction, UnitType targetType) {
 			if (projectileNozzle == null || type == ProjectileType.NONE)
 				return;
 
 			GameObject projectileObj = SICObjectPoolManager.SharedInstance.GetObject(GetRefProjectile(type).OBJECT_ID, type);
 			if (projectileObj != null) {
-				SICProjectiles projectile = projectileObj.GetComponent<SICProjectiles>();
+				SICGameProjectile projectile = projectileObj.GetComponent<SICGameProjectile>();
 				projectile.EnableElement();
 				projectile.SetTargetType(targetType);
 				projectile.SetDirection(direction);
@@ -93,7 +97,7 @@ namespace SpaceImpact {
 			}
 		}
 
-		public SICProjectiles GetRefProjectile(ProjectileType type) {
+		public SICGameProjectile GetRefProjectile(ProjectileType type) {
 			return refProjectiles.Find(a => a.GetProjectileType() == type);
 		}
 

@@ -97,7 +97,7 @@ namespace SpaceImpact {
 		public GameObject GetObject(string id, ProjectileType type) {
 			for (int i = 0; i < objParents.Count; i++) {
 				if (objParents[i].refObj.OBJECT_ID == id) {
-					SICProjectiles projectile = objParents[i].refObj.GetComponent<SICProjectiles>();
+					SICGameProjectile projectile = objParents[i].refObj.GetComponent<SICGameProjectile>();
 					if (projectile != null) {
 						if (projectile.GetProjectileType() == type) {
 							return objParents[i].GetObject();
@@ -197,7 +197,7 @@ namespace SpaceImpact {
 		}
 
 		public ObjectPooled GetParent(string id, ProjectileType type) {
-			return objParents.Find(parent => parent.refObj.OBJECT_ID == id && (parent.refObj as SICProjectiles).GetProjectileType() == type);
+			return objParents.Find(parent => parent.refObj.OBJECT_ID == id && (parent.refObj as SICGameProjectile).GetProjectileType() == type);
 		}
 
 		public ObjectPooled GetParent(string id, BossType type) {

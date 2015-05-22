@@ -24,7 +24,7 @@ namespace SpaceImpact {
 		public const string UI_SCORE_FORMAT = "SCORE: {0}";
 
 		public const string UI_SPECIAL_VALUE_FORMAT = "00";
-		public const string UI_SCORE_VALUE_FORMAT = "000000";
+		public const string UI_SCORE_VALUE_FORMAT = "00000";
 
 		public void Awake() {
 			metricsData = new Dictionary<string, string>();

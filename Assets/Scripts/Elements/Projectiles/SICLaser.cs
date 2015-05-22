@@ -5,7 +5,7 @@ using SpaceImpact.GameCore;
 
 namespace SpaceImpact {
 
-	public class SICLaser : SICProjectiles {
+	public class SICLaser : SICGameProjectile {
 		// Public Variables	
 		[SerializeField] private float rayDuration = 0.2f;
 		[SerializeField] private int instances = 1;

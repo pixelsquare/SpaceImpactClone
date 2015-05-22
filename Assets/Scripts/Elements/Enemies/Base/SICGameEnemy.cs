@@ -37,7 +37,7 @@ namespace SpaceImpact {
 		}
 
 		public override bool OnElementConstraint() {
-			return transform.position.x < SICAreaBounds.MinPosition.x;
+			return transform.position.x < SICAreaBounds.MinExPosition.x;
 		}
 
 		public override void DisableElement(bool showVFX = true) {

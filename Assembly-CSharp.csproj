@@ -59,7 +59,7 @@
      <Compile Include="Assets\Scripts\Elements\Particles\SICInvulnerable.cs" />
      <Compile Include="Assets\Scripts\Elements\Powerup\Base\SICGamePowerup.cs" />
      <Compile Include="Assets\Scripts\Elements\Powerup\SICPowerup.cs" />
-     <Compile Include="Assets\Scripts\Elements\Projectiles\Base\SICProjectiles.cs" />
+     <Compile Include="Assets\Scripts\Elements\Projectiles\Base\SICGameProjectile.cs" />
      <Compile Include="Assets\Scripts\Elements\Projectiles\SICBeam.cs" />
      <Compile Include="Assets\Scripts\Elements\Projectiles\SICLaser.cs" />
      <Compile Include="Assets\Scripts\Elements\Projectiles\SICMissile.cs" />
@@ -72,8 +72,6 @@
      <Compile Include="Assets\Scripts\Metrics\SICGameMetricsKey.cs" />
      <Compile Include="Assets\Scripts\Object Pool\SICObjectPoolManager.cs" />
      <Compile Include="Assets\Scripts\Object Pool\SICObjectPoolName.cs" />
-     <Compile Include="Assets\Scripts\SICGameUtility.cs" />
-     <Compile Include="Assets\Scripts\SICWaypoint.cs" />
      <Compile Include="Assets\Scripts\Stage\Base\SICGameStage.cs" />
      <Compile Include="Assets\Scripts\Stage\SICStage1.cs" />
      <Compile Include="Assets\Scripts\Stage\SICStage2.cs" />
@@ -83,8 +81,11 @@
      <Compile Include="Assets\Scripts\Utility\SICCameraMover.cs" />
      <Compile Include="Assets\Scripts\Utility\SICElementMover.cs" />
      <Compile Include="Assets\Scripts\Utility\SICGameSettings.cs" />
+     <Compile Include="Assets\Scripts\Utility\SICGameUtility.cs" />
      <Compile Include="Assets\Scripts\Utility\SICUnitFiring.cs" />
+     <Compile Include="Assets\Scripts\Utility\SICWaypoint.cs" />
      <None Include="Assets\Version Number.txt" />
+     <None Include="Assets\Enemy Colors.txt" />
      <None Include="Assets\Space Impact Placeholder.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity 5/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

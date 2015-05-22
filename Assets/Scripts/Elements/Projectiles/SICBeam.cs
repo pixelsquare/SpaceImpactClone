@@ -5,7 +5,7 @@ using SpaceImpact.GameCore;
 
 namespace SpaceImpact {
 
-	public class SICBeam : SICProjectiles {
+	public class SICBeam : SICGameProjectile {
 		// Public Variables	
 		[SerializeField] private float beamHeight = 50f;
 
@@ -38,6 +38,27 @@ namespace SpaceImpact {
 		}
 
 		# endregion
+
+		public override void OnTriggerEnter2D(Collider2D col) {
+			base.OnTriggerEnter2D(col);
+			if (col.gameObject.layer == SICLayerManager.ProjectileLayer) {
+				SICGameProjectile projectileElement = col.GetComponent<SICGameProjectile>();
+
+				if (projectileElement == null)
+					return;
+
+				if (projectileElement.Owner == owner)
+					return;
+
+				if (projectileElement.GetProjectileType() == ProjectileType.LASER)
+					return;
+
+				projectileElement.SubtractDurability(999);
+				SICGameManager.SharedInstance.GameMetrics.AddScore(projectileElement.ScorePoint);
+				SubtractDurability(999);
+				ShowExplosionFX();
+			}
+		}
 
 		public void OnTriggerStay2D(Collider2D col) {
 			if (col2D == null)

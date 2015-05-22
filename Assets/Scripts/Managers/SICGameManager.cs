@@ -32,6 +32,7 @@ namespace SpaceImpact.GameCore {
 		private SICGameStage curStage;
 
 		private Vector3 shipInitPos;
+		private SICGameBoss stageBoss;
 
 		// Static Variables
 		private static SICGameManager instance;
@@ -47,6 +48,15 @@ namespace SpaceImpact.GameCore {
 		public List<SICGameStage> RefStages { get { return refStages; } }
 
 		public SICGameStage CurrentStage { get { return curStage; } }
+
+		public bool IsStageComplete { 
+			get {
+				if (stageBoss == null)
+					return false;
+
+				return !stageBoss.IsElementActive; 
+			} 
+		}
 
 		public Text LivesUI { get { return livesUi; } }
 
@@ -96,6 +106,7 @@ namespace SpaceImpact.GameCore {
 			}
 			else {
 				curStage = stageObj.GetComponent<SICGameStage>();
+				stageBoss = curStage.StageBoss;
 			}
 
 			InitCameraMover();
@@ -148,6 +159,7 @@ namespace SpaceImpact.GameCore {
 				return;
 
 			curStage = stageObj.GetComponent<SICGameStage>();
+			stageBoss = curStage.StageBoss;
 		}
 
 		public void ResetStage() {
@@ -229,6 +241,12 @@ namespace SpaceImpact.GameCore {
 # if UNITY_EDITOR
 		public void Update() {
 			LevelsTest();
+
+			if (Input.GetKeyDown(KeyCode.U)) {
+				foreach (GameObject obj in SICGameUtility.GetAllVisibleEnemies()) {
+					Debug.Log(obj.name);
+				}
+			}
 		}
 #endif
 

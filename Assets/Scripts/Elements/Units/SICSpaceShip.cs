@@ -18,6 +18,15 @@ namespace SpaceImpact {
 		private float horiz;
 		private float vert;
 
+		private bool initStart;
+		private bool initEnd;
+
+		private Vector3 startPos;
+		private Vector3 endPos;
+
+		private float startTime;
+		private float totalDistance;
+
 		// Static Variables
 
 		# region Game Element
@@ -31,6 +40,12 @@ namespace SpaceImpact {
 		public override void OnEnable() {
 			base.OnEnable();
 			defaultProjectile = ProjectileType.MISSILE;
+
+			initStart = false;
+			initEnd = false;
+
+			startTime = Time.time;
+			totalDistance = Vector3.Distance(transform.position, startPos);
 		}
 
 		public override void SetHP(int hp) {
@@ -50,13 +65,59 @@ namespace SpaceImpact {
 		# endregion
 
 		public override void OnElementUpdate() {
-			ShipMovement();
-			ShipFiring();
-			ClampShipToArea();
+			if (!SICGameManager.SharedInstance.IsStageComplete) {
+				ShipMovement();
+				ShipFiring();
+				ClampShipToArea();
+			}
+			else {
+				OnStageFinished();
+			}
+
 
 # if UNITY_EDITOR
 			ProjectileTest();
 # endif
+		}
+
+		private void OnStageFinished() {
+			if (!initStart) {
+				startPos = new Vector3(transform.position.x, 2f, transform.position.z);
+				totalDistance = Vector3.Distance(transform.position, startPos);
+				startTime = Time.time;
+				initStart = true;
+			}
+
+			float moveSpeed = (Time.time - startTime) * 0.3f;
+			float moveTime = moveSpeed / totalDistance;
+
+			if (!initEnd) {
+				if (Vector3.Distance(transform.position, startPos) < 0.05f) {
+					endPos = new Vector3(transform.position.x + 7f, transform.position.y, transform.position.z);
+					totalDistance = Vector3.Distance(transform.position, endPos);
+					startTime = Time.time;
+					initEnd = true;
+				}
+			}
+
+			if (initStart && initEnd) {
+				if (Vector3.Distance(transform.position, endPos) <= 0.1f) {
+					Debug.Log("Game ENDING!");
+					SICGameManager.SharedInstance.LoadStage(StageType.NONE);
+					SICGameManager.SharedInstance.GameEnd();
+				}
+			}
+
+			Vector3 pos = (initEnd) ? endPos : startPos;
+			transform.position = Vector3.Lerp(transform.position, pos, moveTime);
+		}
+
+		public override bool IsElementVisible() {
+			if (initStart && initEnd) {
+				return true;
+			}
+
+			return base.IsElementVisible();
 		}
 
 		private void ShipFiring() {

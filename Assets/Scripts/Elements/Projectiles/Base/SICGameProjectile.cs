@@ -12,16 +12,18 @@ namespace SpaceImpact {
 		BEAM = 4
 	}
 
-	public class SICProjectiles : SICGameElement {
+	public class SICGameProjectile : SICGameElement {
 		// Public Variables	
 		[SerializeField] private SpriteRenderer mainTexture;
 		[SerializeField] private int durability = 1;
 		[SerializeField] private int damage = 1;
+		[SerializeField] private int scorePoint = 5;
 
 		// Private Variables
 		private SpriteRenderer originalTexture;
 		private int originalDurability;
 		private int originalDamage;
+		private int originalScorePoint;
 
 		private Vector3 direction;
 		private UnitType targetType;
@@ -41,6 +43,8 @@ namespace SpaceImpact {
 
 		public UnitType TargetType { get { return targetType; } }
 
+		public int ScorePoint { get { return scorePoint; } } 
+
 		public Transform Owner { get { return owner; } }
 
 		public Transform Sender { get { return sender; } } 
@@ -51,6 +55,7 @@ namespace SpaceImpact {
 			originalTexture = mainTexture;
 			originalDurability = durability;
 			originalDamage = damage;
+			originalScorePoint = scorePoint;
 			direction = Vector3.right;
 		}
 
@@ -64,6 +69,7 @@ namespace SpaceImpact {
 			mainTexture = originalTexture;
 			durability = originalDurability;
 			damage = originalDamage;
+			scorePoint = originalScorePoint;
 		}
 
 		public override string OBJECT_ID {
@@ -71,13 +77,17 @@ namespace SpaceImpact {
 		}
 		# endregion
 
+		public override ElementType GetElementType() {
+			return ElementType.PROJECTILE;
+		}
+
 		public virtual void Initialize(Transform owner, Transform sender) {
 			this.owner = owner;
 			this.sender = sender;
 		}
 
 		public virtual ProjectileType GetProjectileType() {
-			return ProjectileType.MISSILE;
+			return ProjectileType.NONE;
 		}
 
 		public virtual void OnTriggerEnter2D(Collider2D col) {
@@ -142,6 +152,21 @@ namespace SpaceImpact {
 		public void SetDurability(int dur) {
 			this.durability = dur;
 			this.durability = Mathf.Clamp(this.durability, 0, int.MaxValue);
+		}
+
+		public void AddScorePoint(int score) {
+			this.scorePoint += score;
+			SetScorePoint(this.scorePoint);
+		}
+
+		public void SubtractScorePoint(int score) {
+			this.scorePoint -= score;
+			SetScorePoint(this.scorePoint);
+		}
+
+		public virtual void SetScorePoint(int score) {
+			this.scorePoint = score;
+			this.scorePoint = Mathf.Clamp(this.scorePoint, 0, int.MaxValue);
 		}
 
 		public void SetDirection(Vector3 dir) {
