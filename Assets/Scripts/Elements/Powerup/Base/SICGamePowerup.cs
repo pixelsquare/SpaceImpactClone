@@ -51,7 +51,12 @@ namespace SpaceImpact {
 				SICSpaceShip ship = unit.GetComponent<SICSpaceShip>();
 				if (ship != null) {
 					ProjectileType projectile = (randomize) ? GetRandomProjectile() : projectileType;
-					ship.SetSpecial(projectile);
+					if (projectile == ProjectileType.MISSILE) {
+						ship.AddHP(1);
+					}
+					else 
+						ship.SetSpecial(projectile);
+
 					DisableElement(false);
 				}
 			}
@@ -81,7 +86,7 @@ namespace SpaceImpact {
 
 			result = (ProjectileType)indx;
 
-			if (result == ProjectileType.NONE || result == ProjectileType.MISSILE)
+			if (result == ProjectileType.NONE)
 				result = ProjectileType.ROCKET;
 
 			return result;
